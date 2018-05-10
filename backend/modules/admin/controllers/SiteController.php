@@ -1,5 +1,5 @@
 <?php
-namespace backend\controllers;
+namespace backend\modules\admin\controllers;
 
 use Yii;
 use yii\web\Controller;
@@ -35,7 +35,7 @@ class SiteController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'logout' => ['post'],
+//                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -60,6 +60,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+//         $this->layout = "@app/modules/admin/views/layouts/main";
         return $this->render('index');
     }
 
@@ -70,16 +71,17 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+       $this->layout = "@app/modules/admin/views/layouts/login";
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
+      
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         } else {
             $model->password = '';
-
             return $this->render('login', [
                 'model' => $model,
             ]);

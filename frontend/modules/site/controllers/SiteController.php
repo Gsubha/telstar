@@ -1,5 +1,5 @@
 <?php
-namespace frontend\controllers;
+namespace frontend\modules\site\controllers;
 
 use Yii;
 use yii\base\InvalidParamException;
@@ -72,7 +72,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $this->layout = "@app/modules/site/views/layouts/main";
+        return $this->render('@app/modules/site/views/site/index');
     }
 
     /**

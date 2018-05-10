@@ -11,6 +11,16 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+      'modules' => [
+         'site' => [
+            'basePath' => '@app/modules/site',
+            'class' => 'frontend\modules\site\user',
+        ],
+        'gii' => [
+            'class' => 'yii\gii\Module',
+        ],
+    ],
+     'defaultRoute' => '/site/site/index',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
@@ -19,6 +29,8 @@ return [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+             'returnUrl' => array('/site/site/index'),
+            'loginUrl' => array('/site/site/login'),
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
@@ -36,14 +48,14 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+        
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+        
     ],
     'params' => $params,
 ];
