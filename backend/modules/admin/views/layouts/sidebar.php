@@ -3,13 +3,13 @@
 use yii\widgets\Menu;
 ?>
   <!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar">
+  <aside class="main-sidebar customsidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="/backend/web/themes/admin/img/avatar5.png" class="img-circle" alt="User Image">
+          <img src="/backend/web/themes/admin/img/avatar.png" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
           <p>Admin</p>
@@ -38,6 +38,7 @@ use yii\widgets\Menu;
             'items' => [
                     ['label' => '<i class="fa fa-dashboard"></i> <span>Dashboard</span>', 'url' => ['site/index']],
                     ['label' => '<i class="fa fa-users"></i> <span>Tech Management</span>', 'url' => ['tech/index'] ],
+                ['label' => '<i class="fa fa-envelope"></i> <span>Portal Management</span>', 'url' => ['portal/index'] ],
                   ['label' => '<i class="fa fa-fw fa-cloud-upload"></i> <span>Billing and Import</span>', 'url' => ['billing/index'] ],
 //                    'url' => ['#'],
 //                    'options' => ['class' => 'treeview'],

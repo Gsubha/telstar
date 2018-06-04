@@ -1,53 +1,90 @@
+      <!-- Main content -->
 <?php
 
-/* @var $this yii\web\View */
-
-$this->title = 'My Yii Application';
+use common\models\Billing;
+use common\models\Portal;
+use common\models\User;
 ?>
-<div class="site-index">
-
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
+    <section class="content">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+            
+      </div>
+        <?php $user=User::find()->where(['id'=>Yii::$app->user->id])->one();
+               $billing = Billing::find()->where('deleted_at =0')->andWhere(['techid' => $user->username])->count(); 
+                $type= Billing::typeList();
+                $staticstart = date('Y-m-d', strtotime('last Sunday'));
+                $staticfinish = date('Y-m-d', strtotime('next Saturday'));
+                $portal =Portal::find()->where('deleted_at =0')->andWhere('status =10')->orderBy(['created_at' => SORT_DESC])->all(); 
+               ?>
+      
+       <div class="row" >
+        <div class="col-md-4">
+          <!-- Widget: user widget style 1 -->
+          <div class="box box-widget widget-user-2">
+            <!-- Add the bg color to the header using any of the bg-* classes -->
+            <div class="widget-user-header bg-black" style="background: url('/backend/web/themes/tech/img/photo4.jpg') center center;">
+              <div class="widget-user-image">
+                <img class="img-circle" src="/backend/web/themes/tech/img/avatar.png" alt="User Avatar">
+              </div>
+              <h3 class="widget-user-username"><?php echo ($user->firstname) ? $user->firstname.' '.$user->lastname : "Tech ID- ".$user->username?></h3>
+              <h5 class="widget-user-desc">Current Week Billing Details</h5>
+                <h4 class="widget-user-desc">From - <?=  Billing::dateFormat($staticstart) ?> </h4>
+                     <h4 class="widget-user-desc">  Until - <?=   Billing::dateFormat($staticfinish) ?> </h4>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
+            <div class="box-footer no-padding">
+              <ul class="nav nav-stacked">
+                  
+                  <?php
+                  $total=0;
+                  foreach ($type as $key => $value) {
+                      
+                   $accessbilling = Billing::accessBillingCount($key);
+                   $total+=$accessbilling;
+                   ?>
+               <li><a href="#"><?= $value?> <span class="pull-right badge bg-blue">$<?= empty($accessbilling)? 0 :$accessbilling ?></span></a></li>    
+                   <?php } ?>
+                  
+                <li><a href="#"><b>Total</b> <span class="pull-right badge bg-red">$<?= $total ?></span></a></li>
+              </ul>
             </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
+          </div>
+          
         </div>
+      
+        <div class="col-md-8">
+          <!-- DIRECT CHAT SUCCESS -->
+          <div class="box box-success direct-chat direct-chat-success">
+            <div class="box-header with-border">
+              <h3 class="box-title">Portal Message</h3>
 
-    </div>
-</div>
+              <div class="box-tools pull-right">
+                   <span data-toggle="tooltip" title="3 New Messages" class="badge bg-red">From Admin</span>
+                <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
+                  <i class="fa fa-comments"></i></button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <!-- Conversations are loaded here -->
+              <div class="direct-chat-messages">
+                <!-- Message. Default to the left -->
+                <div class="direct-chat-msg">
+                    <?php foreach ($portal as $key => $value) { ?>
+                  <div class="direct-chat-info clearfix">
+                    <!--<span class="direct-chat-name pull-left">Admin</span>-->
+                      <div class="col-lg-12 col-md-12">&nbsp;</div>
+                    <span class="direct-chat-timestamp pull-right"><?php echo $value->created_at ?></span>
+                  </div>
+                  <!-- /.direct-chat-info -->
+                  <img class="direct-chat-img" src="/backend/web/themes/tech/img/avatar.png" alt="Message User Image"><!-- /.direct-chat-img -->
+                  <div class="direct-chat-text">
+                    <?php echo $value->portal_message ?>
+                  </div>
+                    <?php } ?>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+    </section>

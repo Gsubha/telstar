@@ -1,19 +1,23 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \common\models\LoginForm */
+/* @var $this View */
+/* @var $form ActiveForm */
+/* @var $model LoginForm */
 
-use yii\helpers\Html;
+use common\models\LoginForm;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+use yii\web\View;
 
 $this->title = 'TelStar';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="login-box">
-    <h1><?= Html::encode($this->title) ?></h1>
+   <div class="login-logo">
+    <a href="#"><b>Telstar</b>Cable</a>
+  </div>
 <div class="login-box-body">
-    <p>Login Details:</p>
+    <p class="login-box-msg login_labelname">Sign In</p>
 
             <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
     <div class="form-group has-feedback">

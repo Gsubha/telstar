@@ -57,9 +57,7 @@ class TechController extends Controller {
         $model->scenario = 'create';
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $post = Yii::$app->request->post();
-            $model->password_hash = Yii::$app->security->generatePasswordHash($post['User']['password_hash']);
-            $model->auth_key = Yii::$app->security->generateRandomString();
-            $model->parent_id = Yii::$app->user->id;
+             $model->created_at = date('Y-m-d H:i:s');
             $model->created_by = Yii::$app->user->id;
             $model->save();
             Yii::$app->getSession()->setFlash('success', 'Tech created successfully');
@@ -78,10 +76,14 @@ class TechController extends Controller {
     }
 
     public function actionUpdate($id) {
-//        $this->layout = "@app/modules/admin/views/layouts/main";
         $model = $this->findModel($id);
-
+  $model->scenario = 'update';
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+              $post = Yii::$app->request->post();
+               $model->created_at = date('Y-m-d H:i:s');
+               if($post['User']['password_hash'])
+            $model->password_hash = Yii::$app->security->generatePasswordHash($post['User']['password_hash']);
+            $model->updated_by = Yii::$app->user->id;
             $model->save();
             Yii::$app->getSession()->setFlash('success', 'Tech updated successfully');
             return $this->redirect(['index', 'id' => $model->id]);

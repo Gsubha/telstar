@@ -1,9 +1,9 @@
 <?php
 
-use backend\assets\MyAppAsset;
+use backend\assets\AppAssetAdmin;
 use common\widgets\Alert;
 
-MyAppAsset::register($this);
+AppAssetAdmin::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

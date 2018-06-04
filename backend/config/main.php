@@ -16,6 +16,11 @@ return [
               'basePath' => '@app/modules/admin',
             'class' => 'backend\modules\admin\admin',
         ],
+        'tech' => [
+            'basePath' => '@app/modules/tech',
+            'class' => 'backend\modules\tech\tech',
+
+        ],
          'gii' => [
             'class' => 'yii\gii\Module',
         ],
@@ -27,10 +32,11 @@ return [
                'baseUrl' => '/webpanel',
         ],
          'user' => [
+//              'class' => 'yii\web\User',
             'identityClass' => 'common\models\User', // your admin model
-            'enableAutoLogin' => false,
-            'identityCookie' => ['name' => 'admin', 'httpOnly' => true],
-                'returnUrl' => array('/admin/site/index'),
+            'enableAutoLogin' => true,
+            'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+//                'returnUrl' => array('/admin/site/index'),
             'loginUrl' => array('/admin/site/login'),
         ],
 //        'user' => [
@@ -52,7 +58,7 @@ return [
             ],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'admin/site/error',
         ],
         
         'urlManager' => [

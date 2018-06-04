@@ -48,6 +48,12 @@ class TechSearch extends User
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+           'sort' => ['defaultOrder' => ['created_at' => 'DESC']],
+             'pagination' => [
+                
+                'pageSize' => 10,
+//                'params' => $datamod
+            ],
         ]);
 
         $this->load($params);

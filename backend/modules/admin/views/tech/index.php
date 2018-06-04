@@ -34,10 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
 //        'filterModel' => $searchModel,
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
-                            'username',
-                            'email',
-                            'firstname',
                             'techid',
+                            'username',
+                             'firstname',
+                            'lastname',
+                            'email',
                             [
                                 'header' => 'Status',
                                 'attribute' => 'status',
@@ -72,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //                                    },
                                     'update' => function ($url, $model) {
 //                                        $url = Url::toRoute('users/edit?id=' . $model->id);
-                                        return Html::a('<i class="fa fa-fw fa-edit"></i>', ['tech/update?id=' . $model->id], ['class' => 'bmodelButton', 'title' => 'Update Student']
+                                        return Html::a('<i class="fa fa-fw fa-edit"></i>', ['tech/update?id=' . $model->id], ['class' => 'bmodelButton', 'title' => 'Update']
                                         );
                                     },
                                             'delete' => function($url, $model) {

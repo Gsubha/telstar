@@ -3,7 +3,7 @@
 namespace common\models;
 
 use Yii;
-use yii2tech\ar\softdelete\SoftDeleteBehavior;
+//use yii2tech\ar\softdelete\SoftDeleteBehavior;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -27,7 +27,8 @@ class User extends ActiveRecord implements IdentityInterface {
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-
+    public $addcode;
+    public $type;
     /**
      * {@inheritdoc}
      */
@@ -38,32 +39,33 @@ class User extends ActiveRecord implements IdentityInterface {
     /**
      * {@inheritdoc}
      */
-    public function behaviors() {
-        return [
-            'softDeleteBehavior' => [
-                'class' => SoftDeleteBehavior::className(),
-                'softDeleteAttributeValues' => [
-                    'isDeleted' => true
-                ],
-                'replaceRegularDelete' => true // mutate native `delete()` method
-            ],
-        ];
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
+//    public function behaviors() {
+//        return [
+//            'softDeleteBehavior' => [
+//                'class' => SoftDeleteBehavior::className(),
+//                'softDeleteAttributeValues' => [
+//                    'isDeleted' => true
+//                ],
+//                'replaceRegularDelete' => true // mutate native `delete()` method
+//            ],
+//        ];
+//        return [
+//            TimestampBehavior::className(),
+//        ];
+//    }
 
     /**
      * {@inheritdoc}
      */
     public function rules() {
         return [
-            ['techid', 'unique'],
+            [['techid','email','username'], 'unique'],
             [['username', 'techid'], 'required'],
             [['password_hash'], 'required','on' => 'create'],
             ['email', 'email'],
+            [['email'], 'required','on' => 'update'],
             ['mobile', 'is10NumbersOnly'],
-            [['lastname','firstname', 'addr', 'created_by', 'updated_by','created_at', 'updated_at'], 'safe'],
+            [['lastname','firstname','mobile', 'addr', 'created_by', 'updated_by','created_at', 'updated_at','city', 'state', 'zip'], 'safe'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
         ];
@@ -78,11 +80,11 @@ class User extends ActiveRecord implements IdentityInterface {
             'username' => 'Username',
             'password_hash' => 'Password',
             'email' => 'Email',
-            'firstname' => 'FirstName',
-            'lastname' => 'LastName',
+            'firstname' => 'First Name',
+            'lastname' => 'Last Name',
             'status' => 'Status',
             'addr' => 'Address',
-            'mobile' => 'MobileNo',
+            'mobile' => 'Mobile No',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'isDeleted' => 'Is Deleted',

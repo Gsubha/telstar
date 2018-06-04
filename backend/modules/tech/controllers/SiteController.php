@@ -1,11 +1,11 @@
 <?php
-namespace backend\controllers;
+namespace  backend\modules\tech\controllers;
 
+use common\models\TechLoginForm;
 use Yii;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
+use yii\filters\VerbFilter;
+use yii\web\Controller;
 
 /**
  * Site controller
@@ -35,7 +35,7 @@ class SiteController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'logout' => ['post'],
+//                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -60,6 +60,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+         $this->layout = "@app/modules/tech/views/layouts/main";
         return $this->render('index');
     }
 
@@ -70,11 +71,12 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $this->layout = "@app/modules/tech/views/layouts/login";
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $model = new LoginForm();
+        $model = new TechLoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         } else {

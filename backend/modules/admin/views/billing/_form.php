@@ -1,11 +1,13 @@
 <?php
 
+use common\models\Billing;
 use yii\helpers\Html;
+use yii\web\View;
 use yii\widgets\ActiveForm;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Billing */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $this View */
+/* @var $model Billing */
+/* @var $form ActiveForm */
 ?>
 
 <section class="content">
@@ -30,10 +32,21 @@ use yii\widgets\ActiveForm;
                 ?>
 <div class="box-body">
      <div class="form-group">
-    <?= $form->field($model, 'type')->dropDownList(['access_point_details'=>'Access Point Details','all_digital_details' => 'All Digital Details', 'billing_details' => 'Billing Details']) ?>
+         <?php $type= Billing::typeList() ?>
+    <?= $form->field($model, 'type')->dropDownList($type,['class' => 'form-control', 'prompt' => '--- Select Type ---']) ?>
 </div>
     <div class="form-group">
-    <?= $form->field($model, 'upload')->fileInput() ?>
+    <?= $form->field($model, 'file')->fileInput() ?>
+        
+        <p>
+        <div style="padding:10px;"> <h6 style="color:RED">Hints:</h6></div>
+        <ul>
+             <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/all_digital_details.xls"> All Digital Details</a> ,<a href="download?url=web/uploads/sample/access_point_details.xls"> Access Point Details</a> ,<a href="download?url=web/uploads/sample/billing_details.xls"> Billing Details</a> )</li>
+           <li> Please fill the list of mandatory fields for each schedule. (TECH ID, DATE, WORK ORDER, PRICE)</li>
+            <!--(III) Please fill the START_TIME and END_TIME using this syntax. Example: 11:00 am (Need space between time and the meridians)Choose your respective affiliate and instructor code.<br>-->
+            </ul>
+        </p>
+        
         </div>
    
     <div class="box-footer">

@@ -26,13 +26,13 @@ use yii\widgets\ActiveForm;
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="/backend/web/themes/admin/img/avatar5.png" class="user-image" alt="User Image">
-              <span class="hidden-xs">Admin</span>
+              <img src="/backend/web/themes/admin/img/avatar.png" class="user-image" alt="User Image">
+              <span class="hidden-xs">Welcome admin</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="/backend/web/themes/admin/img/avatar5.png" class="img-circle" alt="User Image">
+                <img src="/backend/web/themes/admin/img/avatar.png" class="img-circle" alt="User Image">
 
               <!-- Menu Footer-->
               <li class="user-footer">

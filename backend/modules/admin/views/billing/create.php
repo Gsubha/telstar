@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Billing */
 
-$this->title = 'Create Billing';
+$this->title = 'Import Billing';
 $this->params['breadcrumbs'][] = ['label' => 'Billings', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

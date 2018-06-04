@@ -2,13 +2,13 @@
 /* @var $this View */
 /* @var $content string */
 
-use backend\assets\MyAppAsset;
+use backend\assets\AppAssetAdmin;
 use common\widgets\Alert;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
-MyAppAsset::register($this);
+AppAssetAdmin::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -42,14 +42,17 @@ MyAppAsset::register($this);
                 ]);
                 ?>
             </section>
-
-<?php echo $content; ?>  
+            <div class="row">
+                <div class="col-md-12">
+                <?= Alert::widget() ?>
+            </div></div>
+            <?php echo $content; ?>  
             <!-- content -->
         </div>
         <!-- /.right-side -->
 
 
-<?php $this->endBody() ?>
+        <?php $this->endBody() ?>
     </body>
 </html>
 <?php $this->endPage() ?>
