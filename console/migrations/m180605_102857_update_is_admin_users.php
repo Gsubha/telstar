@@ -20,9 +20,7 @@ class m180605_102857_update_is_admin_users extends Migration
      */
     public function safeDown()
     {
-        echo "m180605_102857_update_is_admin_users cannot be reverted.\n";
-
-        return false;
+        $this->update('user', array('is_admin'=> 1), 'id=1');
     }
 
     /*
