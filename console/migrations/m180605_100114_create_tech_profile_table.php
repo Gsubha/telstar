@@ -25,15 +25,14 @@ class m180605_100114_create_tech_profile_table extends Migration
             'user_id' => $this->integer()->Null(),
             'vendor_id' => $this->integer()->Null(),
             'location_id' => $this->integer()->Null(),
-            'work_status' => $this->string(30)->Null(),
-            'status' => $this->smallInteger()->notNull()->defaultValue(1),
+            'work_status' => $this->char(5)->Null(),
             'dob' => $this->date()->Null(),
-            'created_at' => $this->integer()->defaultValue(0),
-            'updated_at' => $this->integer()->defaultValue(0),
-            'created_by' => $this->integer()->defaultValue(0),
-            'updated_by' => $this->integer()->defaultValue(0),
-            'deleted_at' => $this->integer()->defaultValue(0),
-            'status' => $this->integer()->defaultValue(0)
+//            'created_at' => $this->integer()->defaultValue(0),
+//            'updated_at' => $this->integer()->defaultValue(0),
+//            'created_by' => $this->integer()->defaultValue(0),
+//            'updated_by' => $this->integer()->defaultValue(0),
+//            'deleted_at' => $this->integer()->defaultValue(0),
+//            'status' => $this->integer()->defaultValue(0)
         ], $tableOptions);
 
 

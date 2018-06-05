@@ -28,15 +28,15 @@ class m180605_104801_create_tech_official_table extends Migration
             'vid' => $this->string(255)->Null(),
             'pid' => $this->string(255)->Null(),
             'badge_exp_date' => $this->date()->Null(),
-             'insurance_exp' => $this->string(255)->Null(),
+            'insurance_exp' => $this->string(255)->Null(),
             'last_background_check' => $this->string(255)->Null(),
             'term_date' => $this->date()->Null(),
-            'created_at' => $this->dateTime()->Null(),
-            'updated_at' => $this->dateTime()->Null(),
-            'created_by' => $this->integer()->defaultValue(0),
-            'updated_by' => $this->integer()->defaultValue(0),
-            'deleted_at' => $this->integer()->defaultValue(0),
-            'status' => $this->integer()->defaultValue(0)
+//            'created_at' => $this->dateTime()->Null(),
+//            'updated_at' => $this->dateTime()->Null(),
+//            'created_by' => $this->integer()->defaultValue(0),
+//            'updated_by' => $this->integer()->defaultValue(0),
+//            'deleted_at' => $this->integer()->defaultValue(0),
+//            'status' => $this->integer()->defaultValue(0)
         ], $tableOptions);
 
         // creates index for column `user_id`

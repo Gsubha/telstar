@@ -24,19 +24,19 @@ class m180605_103645_create_tech_vehicle_table extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->Null(),
             'license_plate' => $this->string(255)->Null(),
-           'state' => $this->string(100)->Null(),
+            'state' => $this->string(100)->Null(),
             'registration' => $this->string(255)->Null(),
             'reg_exp' => $this->string(255)->Null(),
             'insurance_company' => $this->string(255)->Null(),
             'insurance_exp' => $this->string(255)->Null(),
-             'driver_license' => $this->string(255)->Null(),
-             'issuing_state' => $this->string(255)->Null(),
-            'created_at' => $this->dateTime()->Null(),
-            'updated_at' => $this->dateTime()->Null(),
-            'created_by' => $this->integer()->defaultValue(0),
-            'updated_by' => $this->integer()->defaultValue(0),
-            'deleted_at' => $this->integer()->defaultValue(0),
-            'status' => $this->integer()->defaultValue(10)
+            'driver_license' => $this->string(255)->Null(),
+            'issuing_state' => $this->string(255)->Null(),
+//            'created_at' => $this->dateTime()->Null(),
+//            'updated_at' => $this->dateTime()->Null(),
+//            'created_by' => $this->integer()->defaultValue(0),
+//            'updated_by' => $this->integer()->defaultValue(0),
+//            'deleted_at' => $this->integer()->defaultValue(0),
+//            'status' => $this->integer()->defaultValue(10)
         ], $tableOptions);
 
 
