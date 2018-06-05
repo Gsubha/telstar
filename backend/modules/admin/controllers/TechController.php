@@ -61,7 +61,7 @@ class TechController extends Controller {
             $model->created_by = Yii::$app->user->id;
             $model->save();
             Yii::$app->getSession()->setFlash('success', 'Tech created successfully');
-            return $this->redirect(['index', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                         'model' => $model,
