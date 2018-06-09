@@ -20,24 +20,24 @@ use Yii;
  *
  * @property User $user
  */
-class TechOfficial extends \yii\db\ActiveRecord
-{
+class TechOfficial extends \yii\db\ActiveRecord {
+
     public $inhouse;
     public $corporate;
+    public static $corporateList = ["1" => "60", "2" => "70", "3" => "75", "4" => "80", "5" => "83"];
+    public static $inhouseList = ["1" => "50", "2" => "60", "3" => "65", "4" => "70"];
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'tech_official';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['user_id'], 'integer'],
             [['hire_date', 'badge_exp_date', 'term_date', 'vid', 'pid', 'last_background_check', 'inhouse', 'corporate', 'rate_code_val', 'rate_code_type'], 'safe'],
@@ -55,8 +55,7 @@ class TechOfficial extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
@@ -71,29 +70,25 @@ class TechOfficial extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function corporateList()
-    {
+    public static function corporateList() {
         return array("1" => "60", "2" => "70", "3" => "75", "4" => "80", "5" => "83");
     }
 
-    public static function inhouseList()
-    {
+    public static function inhouseList() {
         return array("1" => "50", "2" => "60", "3" => "65", "4" => "70");
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    public static function calculateRateCode($other_vendor)
-    {
+    public static function calculateRateCode($other_vendor) {
         $model = Vendor::find()
-            ->where(['vendor_type' => $other_vendor])
-            ->one();
+                ->where(['vendor_type' => $other_vendor])
+                ->one();
         if (empty($model)) {
             $vendor = new Vendor();
             $vendor->vendor_type = $other_vendor;
@@ -105,4 +100,5 @@ class TechOfficial extends \yii\db\ActiveRecord
             return $model->id;
         }
     }
+
 }

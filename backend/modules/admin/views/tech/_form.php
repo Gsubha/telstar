@@ -271,14 +271,12 @@ if ($model->isNewRecord)
                                     <div class="col-md-6">
                                         <?= $form->field($tech_offcl, 'rate_code_type')->radioList(['In' => 'In House', 'Cp' => 'Corporate']) ?>
                                         <div class="inhouse">                            
-                                            <?php $inhouse = TechOfficial::inhouseList();
-                                                     $tech_offcl->inhouse = $tech_offcl->rate_code_val;?>
-                                            <?= $form->field($tech_offcl, 'inhouse')->dropDownList($inhouse, ['class' => 'form-control', 'prompt' => '--- Select In House Option ---'])->label('') ?>  
+                                            <?php $tech_offcl->inhouse = $tech_offcl->rate_code_val;?>
+                                            <?= $form->field($tech_offcl, 'inhouse')->dropDownList( TechOfficial::$inhouseList, ['class' => 'form-control', 'prompt' => '--- Select In House Option ---'])->label('') ?>  
                                         </div> 
                                           <div class="corporate"> 
-                                        <?php $corporate = TechOfficial::corporateList() ;
-                                                 $tech_offcl->corporate = $tech_offcl->rate_code_val;?>
-                                        <?= $form->field($tech_offcl, 'corporate')->dropDownList($corporate, ['class' => 'form-control', 'prompt' => '--- Select Corporate Option ---'])->label('') ?>  
+                                        <?php $tech_offcl->corporate = $tech_offcl->rate_code_val;?>
+                                        <?= $form->field($tech_offcl, 'corporate')->dropDownList(TechOfficial::$corporateList, ['class' => 'form-control', 'prompt' => '--- Select Corporate Option ---'])->label('') ?>  
                                         </div> 
                                     </div>
 

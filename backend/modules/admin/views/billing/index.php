@@ -2,6 +2,7 @@
 
 use common\models\Billing;
 use common\models\BillingSearch;
+use common\models\TechOfficial;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -35,6 +36,7 @@ $total = Yii::$app->formatter->asCurrency($sumofamount, 'USD');
 $cost = 0;
 if (!empty($dataProvider->getModels())) {
     foreach ($dataProvider->getModels() as $key => $val) {
+           $tech_offcl = TechOfficial::find()->where(['user_id' => $val->user_id])->one();
         $cost += $val->total;
     }
     $cost = Yii::$app->formatter->asCurrency($cost, 'USD');
@@ -127,7 +129,13 @@ if (!empty($dataProvider->getModels())) {
                                             'attribute' => 'type',
                                             'format' => 'raw',
                                             'value' => function ($model) {
-                                                return 'In house';
+                                                $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                                if($tech_offcl){
+                                                return $tech_offcl->rate_code_type.' '. $tech_offcl->rate_code_val;
+                                                }else{
+                                                   return 'not set' ;
+                                                }
+                                                
                                             },
                                         ],
                                         [
@@ -135,7 +143,33 @@ if (!empty($dataProvider->getModels())) {
                                             'attribute' => 'addcode',
                                             'format' => 'raw',
                                             'value' => function ($model) {
-                                                return '60%';
+                                                
+                                                 $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                                if($tech_offcl){
+                                                    if($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==1){
+                                                          return '50%';
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==2){
+                                                          return '60%';
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==3){
+                                                          return '65%';
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==4){
+                                                          return '70%';
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==1){
+                                                          return '60%';
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==2){
+                                                          return '70%';
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==3){
+                                                          return '75%';
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==4){
+                                                          return '80%';
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==5){
+                                                          return '83%';
+                                                    }
+                                                }  else {
+                                                     return 'not set';
+                                                }
+                                                    
+                                                
                                             },
                                         ],
                                         [
@@ -143,7 +177,32 @@ if (!empty($dataProvider->getModels())) {
                                             'attribute' => 'tech_amount',
                                             'format' => 'raw',
                                             'value' => function ($model) {
-                                                return '$26.7';
+                                                 $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                                if($tech_offcl){
+                                                   if($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==1){
+                                                          $val= 50;
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==2){
+                                                           $val =60;
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==3){
+                                                         $val =65;
+                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==4){
+                                                         $val =70;  
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==1){
+                                                           $val =60;  
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==2){
+                                                         $val =70;   
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==3){
+                                                        $val =75; 
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==4){
+                                                          $val =80; 
+                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==5){
+                                                          $val =83;   
+                                                    }  
+                                                  $total_amount=  ($model->total)*($val/100);
+                                                     return  '$'.$total_amount;
+                                                }else{
+                                                      return '$'.$model->total;
+                                                }
                                             },
                                         ],
                                         ['class' => 'yii\grid\ActionColumn',

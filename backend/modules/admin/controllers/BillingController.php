@@ -4,6 +4,7 @@ namespace backend\modules\admin\controllers;
 
 use common\models\Billing;
 use common\models\BillingSearch;
+use common\models\TechOfficial;
 use PHPExcel_IOFactory;
 use PHPExcel_Shared_Date;
 use Yii;
@@ -53,11 +54,13 @@ class BillingController extends Controller {
     public function actionIndex() {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $searchModel = new BillingSearch();
+         $tech_offcl = new TechOfficial();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+            'tech_offcl'=>$tech_offcl,
         ]);
     }
 
