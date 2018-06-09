@@ -143,32 +143,12 @@ if (!empty($dataProvider->getModels())) {
                                             'attribute' => 'addcode',
                                             'format' => 'raw',
                                             'value' => function ($model) {
-                                                
-                                                 $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                                $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
                                                 if($tech_offcl){
-                                                    if($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==1){
-                                                          return '50%';
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==2){
-                                                          return '60%';
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==3){
-                                                          return '65%';
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==4){
-                                                          return '70%';
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==1){
-                                                          return '60%';
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==2){
-                                                          return '70%';
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==3){
-                                                          return '75%';
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==4){
-                                                          return '80%';
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==5){
-                                                          return '83%';
-                                                    }
+                                                    return TechOfficial::getratecode($tech_offcl->rate_code_type , $tech_offcl->rate_code_val)."%";
                                                 }  else {
-                                                     return 'not set';
+                                                     return '-';
                                                 }
-                                                    
                                                 
                                             },
                                         ],
@@ -179,25 +159,7 @@ if (!empty($dataProvider->getModels())) {
                                             'value' => function ($model) {
                                                  $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
                                                 if($tech_offcl){
-                                                   if($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==1){
-                                                          $val= 50;
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==2){
-                                                           $val =60;
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==3){
-                                                         $val =65;
-                                                    }elseif($tech_offcl->rate_code_type=='In' && $tech_offcl->rate_code_val==4){
-                                                         $val =70;  
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==1){
-                                                           $val =60;  
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==2){
-                                                         $val =70;   
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==3){
-                                                        $val =75; 
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==4){
-                                                          $val =80; 
-                                                    }elseif($tech_offcl->rate_code_type=='Cp' && $tech_offcl->rate_code_val==5){
-                                                          $val =83;   
-                                                    }  
+                                                  $val =  TechOfficial::getratecode($tech_offcl->rate_code_type , $tech_offcl->rate_code_val);
                                                   $total_amount=  ($model->total)*($val/100);
                                                      return  '$'.$total_amount;
                                                 }else{

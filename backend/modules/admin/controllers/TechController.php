@@ -18,9 +18,11 @@ use yii\web\NotFoundHttpException;
 //use yii\web\User;
 //use yii\web\User;
 
-class TechController extends Controller {
+class TechController extends Controller
+{
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'access' => [
                 'class' => AccessControl::className(),
@@ -45,50 +47,52 @@ class TechController extends Controller {
         ];
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $searchModel = new TechSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
-    public function actionCreate() {
+    public function actionCreate()
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $model = new User();
         $model->scenario = 'create';
         $tech = new TechProfile();
         $tech_offcl = new TechOfficial();
         $tech_vehicle = new TechVehicle();
-        $tech->scenario ='createvendor';
+        $tech->scenario = 'createvendor';
 //         $tech_offcl->scenario ='createratecode';
-        
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $post = Yii::$app->request->post();
-            
+
             $model->created_at = date('Y-m-d H:i:s');
             $model->created_by = Yii::$app->user->id;
             $model->save();
-             if ($tech->load(Yii::$app->request->post())) {
-                 if($post['TechProfile']['vendor_id']=='-1'){
-                 $vendor_id= Vendor::insertVendorId($post['TechProfile']['other']);
-                 }
-                 
+            if ($tech->load(Yii::$app->request->post())) {
+                if ($post['TechProfile']['vendor_id'] == '-1') {
+                    $vendor_id = Vendor::insertVendorId($post['TechProfile']['other']);
+                }
+
                 $tech->user_id = $model->id;
                 if (!empty($post['TechProfile']['dob']))
-                $tech->dob = Billing::checkDate($post['TechProfile']['dob']);
-                $tech->vendor_id = ($post['TechProfile']['vendor_id']=='-1') ? $vendor_id : $post['TechProfile']['vendor_id'];
+                    $tech->dob = Billing::checkDate($post['TechProfile']['dob']);
+                $tech->vendor_id = ($post['TechProfile']['vendor_id'] == '-1') ? $vendor_id : $post['TechProfile']['vendor_id'];
                 $tech->save();
             }
             if ($tech_offcl->load(Yii::$app->request->post())) {
-                 if($post['TechOfficial']['rate_code_type']=='In'){
-                 $tech_offcl->rate_code_val=$post['TechOfficial']['inhouse'];
-                 }else{
-                 $tech_offcl->rate_code_val= $post['TechOfficial']['corporate'];
-                 }
+                if ($post['TechOfficial']['rate_code_type'] == 'In') {
+                    $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
+                } else {
+                    $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
+                }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))
                     $tech_offcl->hire_date = Billing::checkDate($post['TechOfficial']['hire_date']);
@@ -104,28 +108,30 @@ class TechController extends Controller {
                 $tech_vehicle->user_id = $model->id;
                 $tech_vehicle->save();
             }
-            
+
             Yii::$app->getSession()->setFlash('success', 'Tech created successfully');
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
-                        'model' => $model,
-                        'tech' => $tech,
-                        'tech_offcl' => $tech_offcl,
-                        'tech_vehicle' => $tech_vehicle,
+                'model' => $model,
+                'tech' => $tech,
+                'tech_offcl' => $tech_offcl,
+                'tech_vehicle' => $tech_vehicle,
             ]);
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         $this->findModel($id)->delete();
         Yii::$app->getSession()->setFlash('success', 'Tech deleted successfully');
         return $this->redirect(['index']);
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         $model = $this->findModel($id);
-        
+
         $tech = TechProfile::find()->where(['user_id' => $id])->one();
         $tech_offcl = TechOfficial::find()->where(['user_id' => $id])->one();
 //        $tech_offcl->scenario ='createratecode';
@@ -141,8 +147,8 @@ class TechController extends Controller {
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             $post = Yii::$app->request->post();
-            
-            
+
+
             $model->created_at = date('Y-m-d H:i:s');
             if ($post['User']['password_hash'])
                 $model->password_hash = Yii::$app->security->generatePasswordHash($post['User']['password_hash']);
@@ -158,11 +164,11 @@ class TechController extends Controller {
                 $tech->save();
             }
             if ($tech_offcl->load(Yii::$app->request->post())) {
-                 if($post['TechOfficial']['rate_code_type']=='In'){
-                 $tech_offcl->rate_code_val=$post['TechOfficial']['inhouse'];
-                 }else{
-                 $tech_offcl->rate_code_val= $post['TechOfficial']['corporate'];
-                 }
+                if ($post['TechOfficial']['rate_code_type'] == 'In') {
+                    $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
+                } else {
+                    $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
+                }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))
                     $tech_offcl->hire_date = Billing::checkDate($post['TechOfficial']['hire_date']);
@@ -182,22 +188,24 @@ class TechController extends Controller {
             return $this->redirect(['index', 'id' => $model->id]);
         } else {
             return $this->render('update', [
-                        'model' => $model,
-                        'tech' => $tech,
-                        'tech_offcl' => $tech_offcl,
-                        'tech_vehicle' => $tech_vehicle,
+                'model' => $model,
+                'tech' => $tech,
+                'tech_offcl' => $tech_offcl,
+                'tech_vehicle' => $tech_vehicle,
             ]);
         }
     }
 
-    public function actionView($id) {
+    public function actionView($id)
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+            'model' => $this->findModel($id),
         ]);
     }
 
-    protected function findModel($id) {
+    protected function findModel($id)
+    {
         if (($model = User::findOne($id)) !== null) {
             return $model;
         } else {

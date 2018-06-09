@@ -70,12 +70,14 @@ class TechOfficial extends \yii\db\ActiveRecord {
         ];
     }
 
-    public static function corporateList() {
-        return array("1" => "60", "2" => "70", "3" => "75", "4" => "80", "5" => "83");
-    }
-
-    public static function inhouseList() {
-        return array("1" => "50", "2" => "60", "3" => "65", "4" => "70");
+    public static function getratecode($rate_type, $rate_value){
+        if($rate_type=="In"){
+            return self::$inhouseList[$rate_value];
+        }else if($rate_type=="Cp"){
+            return self::$corporateList[$rate_value];
+        }else{
+            return 0;
+        }
     }
 
     /**
