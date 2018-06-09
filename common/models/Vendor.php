@@ -15,23 +15,21 @@ use Yii;
  * @property int $updated_by
  * @property int $deleted_at
  */
-class Vendor extends \yii\db\ActiveRecord
-{
+class Vendor extends \yii\db\ActiveRecord {
+
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'vendor';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['vendor_type','status','created_at', 'updated_at','created_by', 'updated_by'], 'safe'],
+            [['vendor_type', 'status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'safe'],
             [['created_by', 'updated_by', 'deleted_at'], 'integer'],
             [['vendor_type'], 'string', 'max' => 150],
         ];
@@ -40,8 +38,7 @@ class Vendor extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'vendor_type' => 'Vendor Type',
@@ -52,4 +49,21 @@ class Vendor extends \yii\db\ActiveRecord
             'deleted_at' => 'Deleted At',
         ];
     }
+
+    public static function insertVendorId($other_vendor) {
+        $model = Vendor::find()
+                ->where(['vendor_type' => $other_vendor])
+                ->one();
+        if (empty($model)) {
+            $vendor = new Vendor();
+            $vendor->vendor_type = $other_vendor;
+            $vendor->created_at = date('Y-m-d H:i:s');
+            $vendor->created_by = Yii::$app->user->id;
+            $vendor->save(false);
+            return $vendor->id;
+        } else {
+            return $model->id;
+        }
+    }
+
 }
