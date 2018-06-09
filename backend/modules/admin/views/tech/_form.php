@@ -97,8 +97,7 @@ if ($model->isNewRecord)
                                         <?= $form->field($model, 'username')->textInput(['maxlength' => true])->label('User Name*') ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <?php $status = TechProfile::typeList() ?>
-                                        <?= $form->field($tech, 'work_status')->dropDownList($status, ['class' => 'form-control', 'prompt' => '--- Select Work Status ---'])->label('Work Status') ?>  
+                                        <?= $form->field($tech, 'work_status')->dropDownList(TechProfile::$workstatusList, ['class' => 'form-control', 'prompt' => '--- Select Work Status ---'])->label('Work Status') ?>
                                     </div>
 
                                 </div>
@@ -230,8 +229,7 @@ if ($model->isNewRecord)
                                         <?= $form->field($tech_offcl, 'hire_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Hire Date'); ?>
                                     </div>
                                     <div class="col-md-6">
-                                        <?php $desc = TechProfile::descList() ?>
-                                        <?= $form->field($tech_offcl, 'job_desc')->dropDownList($desc, ['class' => 'form-control', 'prompt' => '--- Select Job Description ---'])->label('Position Of Job Description') ?>  
+                                        <?= $form->field($tech_offcl, 'job_desc')->dropDownList(TechProfile::$jobdescList, ['class' => 'form-control', 'prompt' => '--- Select Job Description ---'])->label('Position Of Job Description') ?>
 
                                     </div>
                                 </div>

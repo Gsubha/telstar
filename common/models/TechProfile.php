@@ -19,8 +19,12 @@ use Yii;
  */
 class TechProfile extends \yii\db\ActiveRecord
 {
-    
+
     public $other;
+
+    public static $workstatusList = ["A" => "Active", "T" => "Terminated", "OL" => "On Leave"];
+    public static $jobdescList = ["director" => "Director", "supervisor" => "Supervisor", "tech" => "Tech", "dispatch" => "Dispatch"];
+
     /**
      * {@inheritdoc}
      */
@@ -36,11 +40,11 @@ class TechProfile extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'vendor_id', 'location_id'], 'integer'],
-            [['dob','other','user_id', 'vendor_id', 'location_id'], 'safe'],
+            [['dob', 'other', 'user_id', 'vendor_id', 'location_id'], 'safe'],
             [['work_status'], 'string', 'max' => 5],
             [['other'], 'required', 'on' => 'createvendor', 'when' => function ($tech) {
-                    return ($tech->vendor_id == '-1');
-                }, 'whenClient' => "function (attribute, value) {
+                return ($tech->vendor_id == '-1');
+            }, 'whenClient' => "function (attribute, value) {
                 return ($('#techprofile-vendor_id').val() =='-1');
             }"],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -61,13 +65,7 @@ class TechProfile extends \yii\db\ActiveRecord
             'dob' => 'Dob',
         ];
     }
-     public static function typeList() {
-                      return array("A" => "Active", "T" => "Terminated", "OL" => "On Leave");
-       }
-       
-        public static function descList() {
-                      return array("director" => "Director", "supervisor" => "Supervisor", "tech" => "Tech","dispatch"=>"Dispatch");
-       }
+
     /**
      * @return \yii\db\ActiveQuery
      */

@@ -62,7 +62,7 @@ $form = ActiveForm::begin([
 
                     <div class="col-lg-4 col-md-4">
                         <div class="form-group">
-                             <?php $type= Billing::typeList() ?>
+                             <?php $type= Billing::$typeList ?>
                           <?php echo $form->field($model, 'type')->dropDownList($type,['class' => 'form-control', 'prompt' => '--- Select Type ---']) ?>             
                         </div>
                     </div>  

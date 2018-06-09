@@ -24,6 +24,7 @@ class TechOfficial extends \yii\db\ActiveRecord
 {
     public $inhouse;
     public $corporate;
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +40,7 @@ class TechOfficial extends \yii\db\ActiveRecord
     {
         return [
             [['user_id'], 'integer'],
-            [['hire_date', 'badge_exp_date', 'term_date','vid', 'pid','last_background_check','inhouse','corporate','rate_code_val','rate_code_type'], 'safe'],
+            [['hire_date', 'badge_exp_date', 'term_date', 'vid', 'pid', 'last_background_check', 'inhouse', 'corporate', 'rate_code_val', 'rate_code_type'], 'safe'],
             [['job_desc'], 'string', 'max' => 150],
 //             [['corporate'], 'required', 'on' => 'createratecode', 'when' => function ($tech_offcl) {
 //                    return ($tech_offcl->rate_code_type == 'Cp');
@@ -69,14 +70,16 @@ class TechOfficial extends \yii\db\ActiveRecord
             'term_date' => 'Term Date',
         ];
     }
-    
-     public static function corporateList() {
-                      return array("1" => "60", "2" => "70", "3" => "75", "4" => "80", "5" => "83");
-       }
-       
-        public static function inhouseList() {
-                      return array("1" => "50", "2" => "60", "3" => "65", "4" => "70");
-       }
+
+    public static function corporateList()
+    {
+        return array("1" => "60", "2" => "70", "3" => "75", "4" => "80", "5" => "83");
+    }
+
+    public static function inhouseList()
+    {
+        return array("1" => "50", "2" => "60", "3" => "65", "4" => "70");
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -85,11 +88,12 @@ class TechOfficial extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
-    
-    public static function calculateRateCode($other_vendor) {
+
+    public static function calculateRateCode($other_vendor)
+    {
         $model = Vendor::find()
-                ->where(['vendor_type' => $other_vendor])
-                ->one();
+            ->where(['vendor_type' => $other_vendor])
+            ->one();
         if (empty($model)) {
             $vendor = new Vendor();
             $vendor->vendor_type = $other_vendor;

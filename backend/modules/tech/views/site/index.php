@@ -11,8 +11,8 @@ use common\models\User;
             
       </div>
         <?php $user=User::find()->where(['id'=>Yii::$app->user->id])->one();
-               $billing = Billing::find()->where('deleted_at =0')->andWhere(['techid' => $user->username])->count(); 
-                $type= Billing::typeList();
+               $billing = Billing::find()->where('deleted_at =0')->andWhere(['techid' => $user->username])->count();
+
                 $staticstart = date('Y-m-d', strtotime('last Sunday'));
                 $staticfinish = date('Y-m-d', strtotime('next Saturday'));
                 $portal =Portal::find()->where('deleted_at =0')->andWhere('status =10')->orderBy(['created_at' => SORT_DESC])->all(); 
@@ -37,7 +37,7 @@ use common\models\User;
                   
                   <?php
                   $total=0;
-                  foreach ($type as $key => $value) {
+                  foreach (Billing::$typeList as $key => $value) {
                       
                    $accessbilling = Billing::accessBillingCount($key);
                    $total+=$accessbilling;
