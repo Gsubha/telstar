@@ -31,6 +31,8 @@ use yii\web\IdentityInterface;
  */
 class Tech extends ActiveRecord implements IdentityInterface
 {
+    public $file;
+
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
     /**
@@ -57,6 +59,7 @@ class Tech extends ActiveRecord implements IdentityInterface
             [['username'], 'unique'],
             [['email'], 'unique'],
             [['password_reset_token'], 'unique'],
+            [['file'], 'file'],
         ];
     }
 

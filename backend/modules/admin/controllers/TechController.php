@@ -3,6 +3,7 @@
 namespace backend\modules\admin\controllers;
 
 use common\models\Billing;
+use common\models\Tech;
 use common\models\TechOfficial;
 use common\models\TechProfile;
 use common\models\TechSearch;
@@ -14,6 +15,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 //use yii\web\User;
 //use yii\web\User;
@@ -32,7 +34,7 @@ class TechController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers'],
+                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers','import'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -56,6 +58,42 @@ class TechController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionImport(){
+        $model = new Tech();
+
+        if ($model->load(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
+            $model->file = UploadedFile::getInstance($model, 'file');
+
+            if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
+                $date = date('Y-m-d H:i:s');
+                $file = $model->file->name;
+                $folder = Yii::$app->basePath . '/web/uploads/techprofiles/';
+                $model->file->saveAs($folder . $date . $file);
+                return $this->redirect(['index']);
+//                try {
+//                    $filename = $folder . $date . $file;
+//                    $inputFileType = PHPExcel_IOFactory::identify($filename);
+//                    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+//                    $objReader->setReadDataOnly(true);
+//                    $objPHPExcel = $objReader->load($filename);
+//                } catch (Exception $e) {
+//                    die('Error');
+//                }
+
+              //  $sheet = $objPHPExcel->getSheet(0);
+              //  $this->findImport($sheet, $model->type);
+//                    die('okay');
+            } else {
+                \Yii::$app->session->setFlash('error', 'Only files with these extensions are allowed: xls, xlsx');
+            }
+        }
+
+        return $this->render('import', [
+            'model' => $model,
         ]);
     }
 
