@@ -312,7 +312,7 @@ class TechController extends Controller
             $tech_offcl = new TechOfficial();
         if (empty($tech_vehicle))
             $tech_vehicle = new TechVehicle();
-        $model->scenario = 'update';
+        //$model->scenario = 'update';
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 

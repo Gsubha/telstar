@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <p>
                             <div style="padding:10px;"><h6 style="color:RED">Hints:</h6></div>
                             <ul>
-                                <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/tech_profile_information.xls"> Tech Profile Informations</a> )</li>
+                                <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/tech_management.xlsx"> Tech Profile Informations</a> )</li>
                                 <li> Please fill the list of mandatory fields for each schedule. (Tech ID)</li>
                                 <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excelsheet ( DOB , Hire date, Badge Exp Date, Registration Expiration, Last Background Check, Term Date )  </li>
                                 <li> Please fill the <strong>Rate code and value (rate_type_value)</strong> using following syntax,
