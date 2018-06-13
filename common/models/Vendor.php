@@ -52,11 +52,11 @@ class Vendor extends \yii\db\ActiveRecord {
 
     public static function insertVendorId($other_vendor) {
         $model = Vendor::find()
-                ->where(['vendor_type' => $other_vendor])
+                ->where(['vendor_type' => ucwords(strtolower($other_vendor))])
                 ->one();
         if (empty($model)) {
             $vendor = new Vendor();
-            $vendor->vendor_type = $other_vendor;
+            $vendor->vendor_type = ucwords(strtolower($other_vendor));
             $vendor->created_at = date('Y-m-d H:i:s');
             $vendor->created_by = Yii::$app->user->id;
             $vendor->save(false);

@@ -54,4 +54,21 @@ class Location extends \yii\db\ActiveRecord
             'isDeleted' => 'Is Deleted',
         ];
     }
+    
+    public static function insertLocation($location) {
+        $loc = Location::find()
+                ->where(['location' => ucwords(strtolower($location))])
+                ->one();
+        if (empty($loc)) {
+            $loc = new Location();
+            $loc->location = ucwords(strtolower($location));
+            $loc->status = 10;
+            $loc->created_at = date('Y-m-d H:i:s');
+            $loc->created_by = Yii::$app->user->id;
+            $loc->save(false);
+            return $loc->id;
+        } else {
+            return $loc->id;
+        }
+    }
 }

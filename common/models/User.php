@@ -4,6 +4,9 @@ namespace common\models;
 
 use Yii;
 //use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use common\models\TechProfile;
+use common\models\TechOfficial;
+use common\models\TechVehicle;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -211,6 +214,19 @@ class User extends ActiveRecord implements IdentityInterface {
      */
     public function removePasswordResetToken() {
         $this->password_reset_token = null;
+    }
+    
+    public function getProfileUser()
+    {
+        return $this->hasOne(TechProfile::className(), ['user_id' => 'id']);
+    }
+    public function getVehicleUser()
+    {
+        return $this->hasOne(TechVehicle::className(), ['user_id' => 'id']);
+    }
+    public function getOfficialUser()
+    {
+        return $this->hasOne(TechOfficial::className(), ['user_id' => 'id']);
     }
 
 }

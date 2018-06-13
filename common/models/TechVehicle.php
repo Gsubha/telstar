@@ -38,7 +38,7 @@ class TechVehicle extends \yii\db\ActiveRecord
         return [
             [['user_id'], 'integer'],
              [['license_plate', 'registration', 'reg_exp', 'insurance_company', 'insurance_exp', 'driver_license', 'issuing_state'], 'safe'],
-            [['license_plate', 'registration', 'reg_exp', 'insurance_company', 'insurance_exp', 'driver_license', 'issuing_state'], 'string', 'max' => 255],
+            //[['license_plate', 'registration', 'reg_exp', 'insurance_company', 'insurance_exp', 'driver_license', 'issuing_state'], 'string', 'max' => 255],
             [['state'], 'string', 'max' => 100],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];

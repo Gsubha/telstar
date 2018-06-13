@@ -42,7 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             <ul>
                                 <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/tech_profile_information.xls"> Tech Profile Informations</a> )</li>
                                 <li> Please fill the list of mandatory fields for each schedule. (Tech ID)</li>
-                                <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excelsheet ( DOB , Hire date, Badge Exp Date, Registration Expiration )  </li>
+                                <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excelsheet ( DOB , Hire date, Badge Exp Date, Registration Expiration, Last Background Check, Term Date )  </li>
+                                <li> Please fill the <strong>Rate code and value (rate_type_value)</strong> using following syntax,
+                                    <br/>For example, If you want 50% in In-House and the column value will be like <strong>In-1</strong> and for 60% use like <strong>In-2</strong> so on)
+                                    <br/>In House Values [ 1 = 50%, 2 = 60%, 3 = 65%, 4 = 70% ]
+                                    <br/>For example, If you want 60% in Corporate and the column value will be like <strong>Cp-1</strong> and for 70% use like <strong>Cp-2</strong> so on)
+                                    <br/>Corporate Values [ 1 = 60%, 2 = 70%, 3 = 75%, 4 = 80%, 5 = 83% ]
+                                </li>
                                 <!--(III) Please fill the START_TIME and END_TIME using this syntax. Example: 11:00 am (Need space between time and the meridians)Choose your respective affiliate and instructor code.<br>-->
                             </ul>
                             </p>
