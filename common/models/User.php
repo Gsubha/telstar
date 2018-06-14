@@ -228,5 +228,20 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         return $this->hasOne(TechOfficial::className(), ['user_id' => 'id']);
     }
+    public function validateDate($date='')
+    {
+        if(!empty($date))
+        {
+            $exp=explode("/",$date);
+            $month=@$exp[0];
+            $day=@$exp[1];
+            $year=@$exp[2];
+            return @checkdate($month,$day,$year);
+        }
+        else{
+            return false;
+        }
+        
+    }
 
 }
