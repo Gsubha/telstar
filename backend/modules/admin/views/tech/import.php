@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= $form->field($model, 'file')->fileInput() ?>
 
                             <p>
-                            <div style="padding:10px;"><h6 style="color:RED">Hints:</h6></div>
+                            <div style="padding:10px;"><h3 style="color:RED">Hints:</h3></div>
                             <ul>
                                 <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/tech_management.xlsx"> Tech Profile Informations</a> )</li>
                                 <li> Please fill the list of mandatory fields for each schedule. (Tech ID)</li>

@@ -143,7 +143,7 @@ class TechController extends Controller {
                         $tech_imp = new TechProfile();
                         $tech_imp->user_id = $user->id;
                     }
-                    if (User::validateDate($rowData[0][5])) {
+                    if ($user->validateDate($rowData[0][5])) {
                         $tech_imp->dob = date("Y-m-d", strtotime($rowData[0][5]));
                     } else {
                         $tech_imp->dob = NULL;
@@ -183,7 +183,7 @@ class TechController extends Controller {
                         $tech_offcl_imp = new TechOfficial();
                         $tech_offcl_imp->user_id = $user->id;
                     }
-                    if (User::validateDate($rowData[0][19])) {
+                    if ($user->validateDate($rowData[0][19])) {
                         $tech_offcl_imp->hire_date = date("Y-m-d", strtotime($rowData[0][19]));
                     } else {
                         $tech_offcl_imp->hire_date = NULL;
@@ -191,14 +191,14 @@ class TechController extends Controller {
                     $tech_offcl_imp->job_desc = strtolower($rowData[0][20]);
                     $tech_offcl_imp->vid = $rowData[0][22];
                     $tech_offcl_imp->pid = $rowData[0][23];
-                    if (User::validateDate($rowData[0][24])) {
+                    if ($user->validateDate($rowData[0][24])) {
                         $tech_offcl_imp->badge_exp_date = date("Y-m-d", strtotime($rowData[0][24]));
                     } else {
                         $tech_offcl_imp->badge_exp_date = NULL;
                     }
                     $tech_offcl_imp->insurance_exp = $rowData[0][16];
                     $tech_offcl_imp->last_background_check = date("Y-m-d", strtotime($rowData[0][25]));
-                    if (User::validateDate($rowData[0][26])) {
+                    if ($user->validateDate($rowData[0][26])) {
                         $tech_offcl_imp->term_date = date("Y-m-d", strtotime($rowData[0][26]));
                     } else {
                         $tech_offcl_imp->term_date = NULL;
