@@ -15,21 +15,39 @@ use yii\web\View;
 $this->title = 'Billings';
 $this->params['breadcrumbs'][] = $this->title;
 
+
 //Current week start and end date
 $staticstart = date('Y-m-d', strtotime('last Sunday'));
 $staticfinish = date('Y-m-d', strtotime('next Saturday'));
 
 $startdate = ($searchModel->started_at) ? Billing::checkDate($searchModel->started_at) : $staticstart;
-$enddate = ($searchModel->started_at) ? Billing::checkDate($searchModel->ended_at) : $staticfinish;
+$enddate = ($searchModel->ended_at) ? Billing::checkDate($searchModel->ended_at) : date("Y-m-d");
 
 //$startdate=  ($searchModel->started_at) ? date('Y-m-d',strtotime( $searchModel->started_at)) :  $staticstart;
 //$enddate=($searchModel->started_at) ? date('Y-m-d',strtotime( $searchModel->ended_at)) :  $staticfinish ;
+//
+$key=$searchModel->keyword;
 //Get total amount from db
 $total = 0;
 $sumofamount = Billing::find()
         ->where(['deleted_at' => 0])
-        ->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . $startdate . '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' . $enddate . '"')
-        ->sum('total');
+        ->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . $startdate . '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' . $enddate . '"');
+if($searchModel->keyword){
+    $sumofamount= $sumofamount
+       ->andFilterWhere([
+            'or',
+            ['like', 'work_order', $searchModel->keyword],
+            ['like', 'techid', $searchModel->keyword],
+            ['like', 'work_code', $searchModel->keyword],
+        ]);
+       
+}
+if($searchModel->type){
+       $sumofamount= $sumofamount
+            ->andWhere( ['type' => $searchModel->type]);  
+}
+ //echo $sumofamount->createCommand()->getRawSql();  
+$sumofamount= $sumofamount->sum('total');
 $total = Yii::$app->formatter->asCurrency($sumofamount, 'USD');
 
 //Get total amount of this page
@@ -75,8 +93,8 @@ if (!empty($dataProvider->getModels())) {
                             <div class="col-lg-12 col-md-12">
                                 <div class="row">
                                     <?php
-                                    $s1 = Billing::dateFormat($searchModel->started_at);
-                                    $e1 = Billing::dateFormat($searchModel->ended_at);
+                                    $s1 = Billing::dateFormat($startdate);
+                                    $e1 = Billing::dateFormat($enddate);
                                     $s2 = Billing::dateFormat($staticstart);
                                     $e2 = Billing::dateFormat($staticfinish);
                                     ?>
