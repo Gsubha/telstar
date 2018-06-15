@@ -5,6 +5,7 @@
 use backend\assets\AppAssetAdmin;
 use common\widgets\Alert;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\View;
 use yii\widgets\Breadcrumbs;
 
@@ -21,6 +22,10 @@ AppAssetAdmin::register($this);
         <title>TelStar</title>
         <?php $this->head() ?>
     </head>
+    <?php
+    if(Yii::$app->user->id)
+    {
+    ?>
     <body class=" skin-green">
         <?php $this->beginBody() ?>
         <?php $this->beginContent('@app/modules/admin/views/layouts/header.php'); ?>
@@ -54,5 +59,9 @@ AppAssetAdmin::register($this);
 
         <?php $this->endBody() ?>
     </body>
+   <?php } else {
+     Yii::$app->user->logout();
+     return Yii::$app->response->redirect(Yii::$app->homeUrl);
+   } ?>
 </html>
 <?php $this->endPage() ?>
