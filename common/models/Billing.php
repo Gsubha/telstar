@@ -179,7 +179,7 @@ class Billing extends ActiveRecord
     
     public function getTechIds()
     {
-        return User::find()->where(['is_admin'=>0])->all();
+        return User::find()->where(['is_admin'=>0])->orderBy(['techid'=>SORT_ASC])->all();
     }
     
     public function getVendors()
@@ -200,6 +200,26 @@ class Billing extends ActiveRecord
     public function getTech()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+    public function changeDeleteStatus($billing_id=null)
+    {
+        if($billing_id)
+        {
+            $billDet=Billing::find()->where(['user_id'=>$billing_id])->one();
+            if(!empty($billDet))
+            {
+                $billDet->deleted_at=time();
+                $billDet->type=$billDet->type; // give this because type field required
+                $billDet->file='test'; // give this because file field required
+                $billDet->save();
+            }
+            else
+                return false;
+        }
+        else
+        {
+           return false;
+        }
     }
     
 }

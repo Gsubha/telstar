@@ -280,6 +280,7 @@ class TechController extends Controller {
 
     public function actionDelete($id) {
         $this->findModel($id)->delete();
+        Billing::changeDeleteStatus($id);
         Yii::$app->getSession()->setFlash('success', 'Tech deleted successfully');
         return $this->redirect(['index']);
     }
