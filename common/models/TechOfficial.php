@@ -102,5 +102,5 @@ class TechOfficial extends \yii\db\ActiveRecord {
             return $model->id;
         }
     }
-
+    
 }

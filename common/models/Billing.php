@@ -30,7 +30,8 @@ class Billing extends ActiveRecord
 {
 
     public $file;
-
+    public $vendor;
+    public $location;
     public static $typeList = ["access_point_details" => "Access Point Details", "all_digital_details" => "All Digital Details", "billing_details" => "Billing Details"];
 
     /**
@@ -67,9 +68,9 @@ class Billing extends ActiveRecord
             'type' => 'Type',
             'wo_complete_date' => 'Wo Complete Date',
             'work_order' => 'Work Order',
-            'techid' => 'Techid',
+            'techid' => 'Tech ID',
             'work_code' => 'Work Code',
-            'total' => 'Total',
+            'total' => 'Price',
             'date' => 'Date',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -175,6 +176,30 @@ class Billing extends ActiveRecord
         $billing->created_by = $created_by;
         $billing->save(false);
     }
-
-
+    
+    public function getTechIds()
+    {
+        return User::find()->where(['is_admin'=>0])->all();
+    }
+    
+    public function getVendors()
+    {
+        return Vendor::find()->all();
+    }
+    
+    public function getLocations()
+    {
+        return Location::find()->all();
+    }
+    
+    public function getTechProfile()
+    {
+        return $this->hasMany(TechProfile::className(), ['user_id' => 'user_id']);
+    }
+    
+    public function getTech()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+    
 }

@@ -15,6 +15,7 @@ class BillingSearch extends Billing {
     public $started_at;
     public $ended_at;
     public $keyword;
+    public $pageSize;
 
     /**
      * {@inheritdoc}
@@ -75,13 +76,11 @@ class BillingSearch extends Billing {
             $query->andWhere( ['type' => $this->type]);  
             
         }
-        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
              'sort' => ['defaultOrder' => ['wo_complete_date' => 'DESC']],
             'pagination' => [
-               
-                'pageSize' => 10,
+                'pageSize' => $this->pageSize,//50,
 //                'params' => $datamod
             ],
         ]);
@@ -189,6 +188,61 @@ class BillingSearch extends Billing {
                 ->andFilterWhere(['like', 'techid', $this->techid])
                 ->andFilterWhere(['like', 'work_code', $this->work_code]);
 
+        return $dataProvider;
+    }
+    
+    public function techOverviewSearch($params) {
+        $query = Billing::find();
+        if($this->location!='' || $this->vendor!=''){
+            $query->joinWith('techProfile');
+        }
+        $query->where("deleted_at =0");
+         $this->load($params);
+         if($this->location!='')
+         {
+             $query->andWhere(['tech_profile.location_id'=>$this->location]);
+         }
+         if($this->vendor!='')
+         {
+             $query->andWhere(['tech_profile.vendor_id'=>$this->vendor]);
+         }
+        // add conditions that should always apply here
+        if ($this->started_at != "") {
+            if ($this->ended_at == "") {
+                $this->ended_at = date('Y-m-d');
+            }
+            $query->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . date('Y-m-d',strtotime($this->started_at)). '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' .date('Y-m-d',strtotime($this->ended_at)) . '"');
+            $datamod['BillingSearch']['started_at'] =date('Y-m-d',strtotime($this->started_at));
+            $datamod['BillingSearch']['ended_at'] =date('Y-m-d',strtotime($this->ended_at));
+        }else{
+             $staticstart = date('Y-m-d',strtotime('last Sunday'));  
+              $staticfinish = date('Y-m-d',strtotime('next Saturday'));
+                    $query->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . $staticstart. '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' .$staticfinish . '"');
+            $datamod['BillingSearch']['started_at'] =$staticstart;
+            $datamod['BillingSearch']['ended_at'] =$staticfinish;
+    
+        }
+
+        if ($this->techid != "") {
+            $query->andWhere( ['billing.techid' => $this->techid]);  
+            
+        }
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+             'sort' => ['defaultOrder' => ['wo_complete_date' => 'DESC']],
+            'pagination' => [
+                'pageSize' => $this->pageSize,//50,
+//                'params' => $datamod
+            ],
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
         return $dataProvider;
     }
 

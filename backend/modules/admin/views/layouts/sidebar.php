@@ -43,6 +43,13 @@ use yii\widgets\Menu;
                 ['label' => '<i class="fa fa-envelope"></i> <span>Portal Management</span>', 'url' => ['portal/index']],
                 ['label' => '<i class="fa fa-user-plus"></i> <span>Vendor Management</span>', 'url' => ['vendor/index']],
                 ['label' => '<i class="fa fa-map-signs"></i> <span>Location Management</span>', 'url' => ['location/index']],
+                ['label' => '<i class="fa fa-bar-chart"></i> <span>Reports</span><i class="fa pull-right fa-angle-left"></i>',
+                    'url' => ['#'],                    
+                    'options' => ['class' => 'treeview'],                   
+                    'items' => [
+                        ['label' => '<i class="fa fa-angle-double-right"></i> <span>Tech Overview</span>', 'url' => ['billing/tech-overview']],                        
+                    ]
+                ],
 
 
 //                    'url' => ['#'],
@@ -54,7 +61,8 @@ use yii\widgets\Menu;
 
 
             ],
-            'submenuTemplate' => "\n<ul class='treeview-menu'>\n{items}\n</ul>\n",
+            //'submenuTemplate' => "\n<ul class='treeview-menu'>\n{items}\n</ul>\n",
+            'submenuTemplate' => "\n<ul class='treeview-menu' role='menu'>\n{items}\n</ul>\n",
         ]);
         ?>
     </section>

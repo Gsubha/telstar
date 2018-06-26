@@ -89,6 +89,23 @@ if (!empty($dataProvider->getModels())) {
                             <div class="col-lg-12 col-md-12">&nbsp;</div>
                         <?php } ?>
                         <!--</div>-->
+                            <?php
+                            $pagesize=$dataProvider->pagination->pageSize;
+                            $pageoptions=Yii::$app->myclass->pageOptions();//Billing::$pageOptions;
+                            ?>
+                                <label style="color:#31708f;float: right;font-size: 1em;">Show 
+                                    <select name="pagesize" id="pagesize" style="padding: 2px 2px;background:white;border: 1px solid #31708f;">
+                                <?php
+                                foreach($pageoptions as $key=>$val)
+                                {
+                                    if($pagesize==$key)
+                                        echo "<option selected>".$val."</option>";
+                                    else
+                                        echo "<option>".$val."</option>";
+                                }
+                                ?>
+                            </select> entries per page
+                                </label>
                         <div id="Getprintval"> 
                             <div class="col-lg-12 col-md-12">
                                 <div class="row">
@@ -98,7 +115,7 @@ if (!empty($dataProvider->getModels())) {
                                     $s2 = Billing::dateFormat($staticstart);
                                     $e2 = Billing::dateFormat($staticfinish);
                                     ?>
-
+                                    <div class="table-responsive">
                                     <?=
                                     GridView::widget([
                                         'layout' => "<div class='panel panel-info'>"
@@ -223,6 +240,7 @@ if (!empty($dataProvider->getModels())) {
                                                                         ],
                                                                     ]);
                                                                     ?>
+                                    </div>
                                                                 </div> </div> </div>
 
                                                     </div>
@@ -232,7 +250,12 @@ if (!empty($dataProvider->getModels())) {
                                     <?php
                                     $js = <<< EOD
 $(document).ready(function(){
-        
+    $("#pagesize").change(function(){
+      k=$('form').serialize()+'&pagesize='+$(this).val();
+      var pageURL = window.location.hostname + window.location.pathname;
+      window.location.href=document.location.protocol +"//"+pageURL+'?'+k;
+    });
+    
     $("#printdiv").click(function() {   
         var innerContents = document.getElementById("Getprintval").innerHTML;
         var popupWinindow = window.open('', '_blank', 'width=700,height=700,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no,titlebar=no');

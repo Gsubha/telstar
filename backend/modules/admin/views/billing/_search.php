@@ -64,7 +64,7 @@ $form = ActiveForm::begin([
                           <?= $form->field($model, 'type')->dropDownList($type,['class' => 'form-control', 'prompt' => '--- Select Type ---']) ?>             
                         </div>
                     </div>  
-                    <!--<div class="col-lg-4 col-md-4">-->
+                   <!--<div class="col-lg-4 col-md-4">-->
                         <!--<div class="form-group">-->
                             <?php
                             //echo $form->field($model, 'student.studentProfile.dob');
@@ -72,19 +72,8 @@ $form = ActiveForm::begin([
                             ?>                  
                         <!--</div>-->
                     <!--</div>-->  
-
-                    <div class="col-lg-1 col-md-1 reset1">
-                        <div class="form-group">
-                            <label>&nbsp;</label>                        
-                            <?= Html::submitButton('Search', ['class' => 'btn btn-primary ']) ?>&nbsp;
-                        </div></div>
-                         <div class="col-lg-1 col-md-1 reset1">
-                        <div class="form-group">
-                            <label>&nbsp;</label>                        
-                      <?= Html::a('Reset', ['index'], ['class' => 'btn btn-default']) ?>
-                        </div>
-                    </div>
-
+                    <div class="col-lg-1 col-md-1 reset1" style="margin-top:25px;"><?= Html::submitButton('Search', ['class' => 'btn btn-primary ']) ?></div>
+                    <div class="col-lg-1 col-md-1 reset1" style="margin-top:25px;"><?= Html::a('Reset', ['index'], ['class' => 'btn btn-default']) ?></div>    
                 </div>
                 <p><b>*Search By Keyword ( Tech ID, Work Code, Work Order )</b></p>
             </section>
@@ -96,6 +85,8 @@ $form = ActiveForm::begin([
 ActiveForm::end();
 $script = <<< JS
 $(document).ready(function(){
+        var height = $('.content-wrapper:visible').css('height');
+        $(".customsidebar").height(height);
     //Date picker
     $('.datepicker').datepicker({
 //         dateFormat: 'yy-mm-dd' ,

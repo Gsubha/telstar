@@ -187,29 +187,29 @@ if ($model->isNewRecord)
 
                                     <div class="form-group">
                                         <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'registration')->textInput(['maxlength' => true]) ?>
+                                            <?php /* echo $form->field($tech_vehicle, 'registration')->textInput(['maxlength' => true]) */ ?>
+                                            <?= $form->field($tech_vehicle, 'reg_exp')->textInput(['maxlength' => true]) ?>
                                         </div>
                                         <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'reg_exp')->textInput(['maxlength' => true]) ?>
+                                           <?= $form->field($tech_vehicle, 'insurance_company')->textInput(['maxlength' => true]) ?>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="col-md-6">
-
-                                            <?= $form->field($tech_vehicle, 'insurance_company')->textInput(['maxlength' => true]) ?>
-                                        </div>
                                         <div class="col-md-6">
                                             <?= $form->field($tech_vehicle, 'insurance_exp')->textInput(['maxlength' => true]) ?>
                                         </div>
+                                        <div class="col-md-6">
+                                           <?= $form->field($tech_vehicle, 'driver_license')->textInput(['maxlength' => true]) ?> 
+                                        </div>
 
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'driver_license')->textInput(['maxlength' => true]) ?>
+                                            <?= $form->field($tech_vehicle, 'issuing_state')->textInput(['maxlength' => true]) ?> 
                                         </div>
                                         <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'issuing_state')->textInput(['maxlength' => true]) ?>
+                                           
                                         </div>
 
                                     </div>

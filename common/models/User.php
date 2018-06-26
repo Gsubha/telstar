@@ -224,7 +224,7 @@ class User extends ActiveRecord implements IdentityInterface {
     {
         return $this->hasOne(TechVehicle::className(), ['user_id' => 'id']);
     }
-    public function getOfficialUser()
+    public function getTechOfficial()
     {
         return $this->hasOne(TechOfficial::className(), ['user_id' => 'id']);
     }
@@ -243,5 +243,11 @@ class User extends ActiveRecord implements IdentityInterface {
         }
         
     }
-
+    
+    public static function gettechname($techid=null)
+    {
+        $v=User::find()->where(['techid'=>$techid])->one();
+        return $v->username;
+        
+    }
 }

@@ -177,8 +177,8 @@ class TechController extends Controller {
                     /* Tech Vehicle Table Insert/Updated - Ended */
 
                     /* Tech Official Table Insert/Updated - Started */
-                    if (isset($umodel->officialUser)) {
-                        $tech_offcl_imp = $umodel->officialUser;
+                    if (isset($umodel->techOfficial)) {
+                        $tech_offcl_imp = $umodel->techOfficial;
                     } else {
                         $tech_offcl_imp = new TechOfficial();
                         $tech_offcl_imp->user_id = $user->id;
