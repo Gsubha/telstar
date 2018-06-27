@@ -29,14 +29,14 @@ $billing_obj = new Billing();
             </div>
             <section class="content boxheight">
                 <div class="row">
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
                             <?php
                             echo $form->field($model, 'techid')->dropDownList(ArrayHelper::map($billing_obj->techIds, 'techid', 'techid'), ['class' => 'form-control', 'prompt' => '--- All ---']);
                             ?>             
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
                             <?php
                             if (isset($_GET['BillingSearch']['vendor'])) {
@@ -46,7 +46,7 @@ $billing_obj = new Billing();
                             ?>             
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
                             <?php
                             if (isset($_GET['BillingSearch']['location'])) {
@@ -56,21 +56,21 @@ $billing_obj = new Billing();
                             ?>             
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
                             <?php echo $form->field($model, 'started_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i> Start Date'); ?>                  
                         </div>
                     </div> 
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
 
                             <?php echo $form->field($model, 'ended_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i> End Date'); ?>                  
                         </div>
                     </div> 
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-4">
                         <div class="form-group">
-                            <div class="col-lg-4 col-md-4 reset1" style="margin-top:25px;"><?= Html::submitButton('Search', ['class' => 'btn btn-primary ']) ?></div>
-                            <div class="col-lg-4 col-md-4 reset1" style="margin-top:25px;"><?= Html::a('Reset', ['tech-overview'], ['class' => 'btn btn-default']) ?></div>    
+                            <div class="col-lg-3 col-md-3 reset1" style="margin-top:25px;margin-left: -15px;"><?= Html::submitButton('Search', ['class' => 'btn btn-primary ']) ?></div>
+                            <div class="col-lg-3 col-md-3 reset1" style="margin-top:25px;"><?= Html::a('Reset', ['tech-overview'], ['class' => 'btn btn-default']) ?></div>    
                         </div>
                     </div> 
 
