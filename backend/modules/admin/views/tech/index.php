@@ -29,6 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= Html::a('Create Tech', ['create'], ['class' => 'btn btn-success']) ?>
                     </div></div>
                 <div class="box-body">
+                    <?php
+                    $pagesize = $dataProvider->pagination->pageSize;
+                    $pageoptions = Yii::$app->myclass->pageOptions(); //Billing::$pageOptions;
+                    ?>
+                    <label style="color:#31708f;float: right;font-size: 1em;">Show 
+                        <select name="pagesize" id="pagesize" style="padding: 2px 2px;background:white;border: 1px solid #31708f;">
+                            <?php
+                            foreach ($pageoptions as $key => $val) {
+                                if ($pagesize == $key)
+                                    echo "<option selected>" . $val . "</option>";
+                                else
+                                    echo "<option>" . $val . "</option>";
+                            }
+                            ?>
+                        </select> entries per page
+                    </label>
                     <?=
                     GridView::widget([
                         'dataProvider' => $dataProvider,
@@ -37,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
                             'techid',
                             'username',
-                             'firstname',
+                            'firstname',
                             'lastname',
                             'email',
                             [
@@ -77,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         return Html::a('<i class="fa fa-fw fa-edit"></i>', ['tech/update?id=' . $model->id], ['class' => 'bmodelButton', 'title' => 'Update']
                                         );
                                     },
-                                            'delete' => function($url, $model) {
+                                    'delete' => function($url, $model) {
 //                            if ($model->dlStudentCourses->scr_paid_status == "1" && $model->dlStudentCourses->scr_completed_status == "0") {
                                         return Html::a('<i class="fa fa-fw fa-trash"></i>', ['tech/delete', 'id' => $model->id], [
                                                     'class' => '',
@@ -88,12 +104,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ]);
 //                            }
                                     },
-                                        ],
-                                    ],
                                 ],
-                            ]);
-                            ?>
+                            ],
+                        ],
+                    ]);
+                    ?>
                 </div>
             </div>
         </div></div>
 </section>
+<?php
+$js = <<< EOD
+$(document).ready(function(){
+    $("#pagesize").change(function(){
+      k=$('form').serialize()+'&pagesize='+$(this).val();
+      var pageURL = window.location.hostname + window.location.pathname;
+      window.location.href=document.location.protocol +"//"+pageURL+'?'+k;
+    });
+    
+});
+EOD;
+$this->registerJs($js, View::POS_END);
+?>

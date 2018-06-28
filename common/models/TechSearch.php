@@ -12,6 +12,7 @@ use common\models\User;
  */
 class TechSearch extends User
 {
+    public $pageSize;
     /**
      * {@inheritdoc}
      */
@@ -51,7 +52,7 @@ class TechSearch extends User
            'sort' => ['defaultOrder' => ['created_at' => 'DESC']],
              'pagination' => [
                 
-                'pageSize' => 10,
+                'pageSize' =>  $this->pageSize,//50,
 //                'params' => $datamod
             ],
         ]);

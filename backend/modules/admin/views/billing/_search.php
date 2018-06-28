@@ -48,13 +48,13 @@ $form = ActiveForm::begin([
                     </div> -->
                     <div class="col-lg-4 col-md-4">
                         <div class="form-group">
-                            <?php echo $form->field($model, 'started_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i>Start Date'); ?>                  
+                            <?php echo $form->field($model, 'started_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i> Start Date'); ?>                  
                         </div>
                     </div> 
                     <div class="col-lg-4 col-md-4">
                         <div class="form-group">
 
-                            <?php echo $form->field($model, 'ended_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i>End Date'); ?>                  
+                            <?php echo $form->field($model, 'ended_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i> End Date'); ?>                  
                         </div>
                     </div> 
 

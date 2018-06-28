@@ -31,7 +31,7 @@ class Billing extends ActiveRecord
 
     public $file;
     public $vendor;
-    public $location;
+    public $location,$jobs,$price,$username,$total_dAmt;
     public static $typeList = ["access_point_details" => "Access Point Details", "all_digital_details" => "All Digital Details", "billing_details" => "Billing Details"];
 
     /**
@@ -220,6 +220,14 @@ class Billing extends ActiveRecord
         {
            return false;
         }
+    }
+    
+    public function getTechOfficial()
+    {
+        return $this->hasOne(TechOfficial::className(), ['user_id' => 'user_id']);
+    }
+    public function getUser() {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
     
 }

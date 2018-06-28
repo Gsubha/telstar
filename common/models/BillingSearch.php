@@ -15,7 +15,7 @@ class BillingSearch extends Billing {
     public $started_at;
     public $ended_at;
     public $keyword;
-    public $pageSize;
+    public $pageSize,$price;
 
     /**
      * {@inheritdoc}
@@ -156,7 +156,7 @@ class BillingSearch extends Billing {
             'sort' => ['defaultOrder' => ['wo_complete_date' => 'DESC']],
             'pagination' => [
                 
-                'pageSize' => 10,
+                'pageSize' =>  $this->pageSize,//50,
 //                'params' => $datamod
             ],
         ]);
@@ -192,10 +192,11 @@ class BillingSearch extends Billing {
     }
     
     public function techOverviewSearch($params) {
-        $query = Billing::find();
+        $query = Billing::find()->joinWith(['user','techOfficial']);
         if($this->location!='' || $this->vendor!=''){
             $query->joinWith('techProfile');
         }
+        $query->select(['billing.user_id','user.username','billing.techid','count(billing.id) as jobs','SUM(ROUND((billing.total),2)) AS price','SUM(ROUND(((billing.total)*(tech_official.rate_percent)/100),2)) AS total_dAmt','tech_official.rate_code_val', 'tech_official.rate_code_type']);
         $query->where("deleted_at =0");
          $this->load($params);
          if($this->location!='')
@@ -227,6 +228,8 @@ class BillingSearch extends Billing {
             $query->andWhere( ['billing.techid' => $this->techid]);  
             
         }
+        $query->groupBy(['billing.user_id']);
+        // echo "<div style='padding:10px;border:1px solid;color:green;'>".$query->createCommand()->getRawSql()."</div>";         
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
              'sort' => ['defaultOrder' => ['wo_complete_date' => 'DESC']],

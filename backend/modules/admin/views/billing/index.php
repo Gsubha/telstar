@@ -46,9 +46,25 @@ if($searchModel->type){
        $sumofamount= $sumofamount
             ->andWhere( ['type' => $searchModel->type]);  
 }
+$records = $sumofamount->all();
  //echo $sumofamount->createCommand()->getRawSql();  
 $sumofamount= $sumofamount->sum('total');
 $total = Yii::$app->formatter->asCurrency($sumofamount, 'USD');
+
+
+//Get total amount of all pages
+$sumoftech_total_amount = 0;
+if (!empty($records)) {
+    foreach ($records as $key => $val) {
+        $tech_offcl = TechOfficial::find()->where(['user_id' => $val->user_id])->one();
+        if ($tech_offcl) {
+            $techval = TechOfficial::getratecode($tech_offcl->rate_code_type, $tech_offcl->rate_code_val);
+            $total_amount = ($val->total) * ($techval / 100);
+        }
+        $sumoftech_total_amount += (!empty($tech_offcl->rate_code_val)) ? number_format((float) $total_amount, 2, '.', '') : $val->total;
+    }
+    $sumoftech_total_amount = Yii::$app->formatter->asCurrency($sumoftech_total_amount, 'USD');
+}
 
 //Get total amount of this page
 $cost = 0;
@@ -125,6 +141,7 @@ if (!empty($dataProvider->getModels())) {
                                         . "<div class='panel-body'>"
                                         . (($searchModel->started_at) ? "<h3>Payment Received From {$s1} until {$e1} </h3>" : "<h3>Current Week Listing From {$s2} until {$e2} </h3>")
                                         . " <h4>Total Price: <strong>{$total}</strong></h4>"
+                                        . " <h4>Total Due Amount: <strong>{$sumoftech_total_amount}</strong></h4>"
                                         . "  {items}{pager}</div></div>",
                                         'dataProvider' => $dataProvider,
                                         'showFooter' => true,

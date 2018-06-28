@@ -259,6 +259,9 @@ class BillingController extends Controller {
             $searchModel->vendor = $_GET['BillingSearch']['vendor'];
         }
         $dataProvider = $searchModel->techOverviewSearch(Yii::$app->request->queryParams);
+//        echo "<pre>";
+//        print_r($dataProvider);
+//        echo "</pre>";
         $pagesize = (isset($_GET['pagesize'])) ? $_GET['pagesize'] : 50;
         $dataProvider->pagination->pageSize = $pagesize;
         return $this->render('tech_overview_index', [

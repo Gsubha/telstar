@@ -54,7 +54,8 @@ class TechController extends Controller {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $searchModel = new TechSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $pagesize = (isset($_GET['pagesize'])) ? $_GET['pagesize'] : 50;
+        $dataProvider->pagination->pageSize = $pagesize;
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
@@ -210,6 +211,7 @@ class TechController extends Controller {
                     if (isset($rate_type_value[1])) {
                         $tech_offcl_imp->rate_code_val = $rate_type_value[1];
                     }
+                    $tech_offcl_imp->rate_percent=$tech_offcl_imp->getratecode($tech_offcl_imp->rate_code_type, $tech_offcl_imp->rate_code_val);
                     $tech_offcl_imp->save();
                     /* Tech Official Table Insert/Updated - Ended */
                 }
@@ -247,8 +249,10 @@ class TechController extends Controller {
             if ($tech_offcl->load(Yii::$app->request->post())) {
                 if ($post['TechOfficial']['rate_code_type'] == 'In') {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
+                    $tech_offcl->rate_percent=$tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
                 } else {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
+                    $tech_offcl->rate_percent=$tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
                 }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))
@@ -322,8 +326,10 @@ class TechController extends Controller {
             if ($tech_offcl->load(Yii::$app->request->post())) {
                 if ($post['TechOfficial']['rate_code_type'] == 'In') {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
+                    $tech_offcl->rate_percent=$tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
                 } else {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
+                    $tech_offcl->rate_percent=$tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
                 }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))

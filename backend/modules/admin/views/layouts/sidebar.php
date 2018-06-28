@@ -38,7 +38,7 @@ use yii\widgets\Menu;
             'activateItems' => true,
             'items' => [
                 ['label' => '<i class="fa fa-dashboard"></i> <span>Dashboard</span>', 'url' => ['site/index']],
-                ['label' => '<i class="fa fa-fw fa-cloud-upload"></i> <span>Billing and Import</span>', 'url' => ['billing/index']],
+                ['label' => '<i class="fa fa-fw fa-cloud-upload"></i> <span>Tech Codes & Import</span>', 'url' => ['billing/index']],
                 ['label' => '<i class="fa fa-users"></i> <span>Tech Management</span>', 'url' => ['tech/index']],
                 ['label' => '<i class="fa fa-envelope"></i> <span>Portal Management</span>', 'url' => ['portal/index']],
                 ['label' => '<i class="fa fa-user-plus"></i> <span>Vendor Management</span>', 'url' => ['vendor/index']],
