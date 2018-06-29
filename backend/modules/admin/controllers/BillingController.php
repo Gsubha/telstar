@@ -144,7 +144,7 @@ class BillingController extends Controller {
                 $model = Billing::find()
                         ->where(['techid' => $rowData[0][1]])
                         ->andWhere(['type' => $type])
-                        ->andWhere(['date' => $date])
+                        ->andWhere(['wo_complete_date' => $date])
                         ->andWhere(['work_order' => $rowData[0][2]])
                         ->andWhere(['user_id' => $user_id])
                         ->one();
@@ -195,7 +195,7 @@ class BillingController extends Controller {
                 $model = Billing::find()
                         ->where(['techid' => $rowData[0][3]])
                         ->andWhere(['type' => $type])
-                        ->andWhere(['date' => $date])
+                        ->andWhere(['wo_complete_date' => $date])
                         ->andWhere(['work_order' => $rowData[0][4]])
                         ->andWhere(['user_id' => $user_id])
                         ->one();
