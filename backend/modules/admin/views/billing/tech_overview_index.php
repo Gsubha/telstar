@@ -24,6 +24,67 @@ $staticfinish = date('Y-m-d', strtotime('next Saturday'));
 
 $startdate = ($searchModel->started_at) ? Billing::checkDate($searchModel->started_at) : $staticstart;
 $enddate = ($searchModel->ended_at) ? Billing::checkDate($searchModel->ended_at) : date("Y-m-d");
+
+// Overall Total Section - start
+$Overall_Total_price_amount = 0;
+$Overall_Total_due_amount = 0;
+
+$query = Billing::find()->joinWith(['user','techOfficial']);
+if ($searchModel->location != '' || $searchModel->vendor != '') {
+    $query->joinWith('techProfile');
+}
+ $query->select(['SUM(ROUND((billing.total),2)) AS price','SUM(ROUND(((billing.total)*(tech_official.rate_percent)/100),2)) AS total_dAmt']);
+if ($searchModel->location) {
+    $query->andWhere(['tech_profile.location_id' => $searchModel->location]);
+}
+if ($searchModel->vendor) {
+    $query->andWhere(['tech_profile.vendor_id' => $searchModel->vendor]);
+}
+if ($searchModel->techid) {
+    $query->andWhere(["billing.techid" => $searchModel->techid]);
+}
+
+$query->andWhere(['billing.deleted_at' => 0])->andWhere('DATE_FORMAT(billing.wo_complete_date ,"%Y-%m-%d") >= "' . $startdate . '" AND DATE_FORMAT(billing.wo_complete_date,"%Y-%m-%d") <= "' . $enddate . '"');
+$query->groupBy(['billing.user_id']);
+//echo "<div style='padding:10px;border:1px solid;color:green;'>".$query->createCommand()->getRawSql()."</div>";  
+$records=$query->all();
+if(!empty($records))
+{
+    foreach($records as $rk => $rv)
+    {
+        $Overall_Total_price_amount += $rv->price;
+        if($rv->total_dAmt==0){
+           $Overall_Total_due_amount += $rv->price;
+        }
+       else {
+          $Overall_Total_due_amount += $rv->total_dAmt; 
+       }
+    }
+}
+
+$Overall_Total_price_amount= Yii::$app->formatter->asCurrency($Overall_Total_price_amount, 'USD');
+$Overall_Total_due_amount= Yii::$app->formatter->asCurrency($Overall_Total_due_amount, 'USD');
+// Overall Total Section - end
+
+// Footer Total section - start
+$Total_price_amount = 0;
+$Total_due_amount = 0;
+if (!empty($dataProvider->getModels())) {
+    foreach ($dataProvider->getModels() as $key => $val) {
+        $Total_price_amount += $val->price;
+        if($val->total_dAmt==0){
+             $Total_due_amount += $val->price;
+        }else{
+        $Total_due_amount += $val->total_dAmt;
+        }
+    }
+    $Total_price_amount = number_format((float) $Total_price_amount, 2, '.', '');
+    $Total_price_amount = Yii::$app->formatter->asCurrency($Total_price_amount, 'USD');
+
+    $Total_due_amount = number_format((float) $Total_due_amount, 2, '.', '');
+    $Total_due_amount = Yii::$app->formatter->asCurrency($Total_due_amount, 'USD');
+}
+// Footer Total section - end
 ?>
 <section class="content">
     <div class="row">
@@ -70,6 +131,8 @@ $enddate = ($searchModel->ended_at) ? Billing::checkDate($searchModel->ended_at)
                                         . "<h3 class='panel-title'>Tech Overview Report</h3></div>"
                                         . "<div class='panel-body'>"
                                         . (($searchModel->started_at) ? "<h3>Payment Received From {$s1} until {$e1} </h3>" : "<h3>Current Week Listing From {$s2} until {$e2} </h3>")
+                                        . " <h4>Total Price: <strong>{$Overall_Total_price_amount}</strong></h4>"
+                                        . " <h4>Total Due Amount: <strong>{$Overall_Total_due_amount}</strong></h4>"
                                         . "  {items}{pager}</div></div>",
                                         'dataProvider' => $dataProvider,
                                         'showFooter' => true,
@@ -83,21 +146,24 @@ $enddate = ($searchModel->ended_at) ? Billing::checkDate($searchModel->ended_at)
                                             [
                                                 'header' => 'Total Price',
                                                 'attribute' => 'price',
-                                                'value' => function($model){
-                                                $tprice = number_format((float) $model->price, 2, '.', '');
-                                                return Yii::$app->formatter->asCurrency($tprice, 'USD');
-                                                }
+                                                'value' => function($model) {
+                                                    $tprice = number_format((float) $model->price, 2, '.', '');
+                                                    return Yii::$app->formatter->asCurrency($tprice, 'USD');
+                                                },
+                                                'footer' => "<strong>" . $Total_price_amount . "</strong>",
                                             ],
                                             [
                                                 'header' => 'Total Amount',
                                                 'attribute' => 'total_dAmt',
                                                 'format' => 'raw',
-                                                 'value' => function($model){
+                                                'value' => function($model) {
                                                     $Total_dueAmt = number_format((float) $model->total_dAmt, 2, '.', '');
-                                                    if($Total_dueAmt==0){$Total_dueAmt=number_format((float) $model->price, 2, '.', '');}
+                                                    if ($Total_dueAmt == 0) {
+                                                        $Total_dueAmt = number_format((float) $model->price, 2, '.', '');
+                                                    }
                                                     return Yii::$app->formatter->asCurrency($Total_dueAmt, 'USD');
-                                                    
                                                 },
+                                                'footer' => "<strong>" . $Total_due_amount . "</strong>",
                                             ],
                                         ],
                                     ]);
