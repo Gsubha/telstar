@@ -138,6 +138,11 @@ class BillingController extends Controller {
                 if ($row == 1) {
                     continue;
                 }
+                $rowData[0][0]= trim($rowData[0][0]);
+                $rowData[0][1] = trim($rowData[0][1]);
+                $rowData[0][2] = trim($rowData[0][2]);
+                
+
                 //$rowData[0][0]= DATE, $rowData[0][1]= TECHID, $rowData[0][2]= WORK ORDER,$rowData[0][3]= TOTAL 
                 $date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][0]));
                 $user_id = Billing::insertTechId($rowData[0][1]);
@@ -164,6 +169,11 @@ class BillingController extends Controller {
                 if ($row == 1) {
                     continue;
                 }
+                $rowData[0][0]= trim($rowData[0][0]);
+                $rowData[0][4] = trim($rowData[0][4]);
+                $rowData[0][2] = trim($rowData[0][2]);
+                $rowData[0][8] = trim($rowData[0][8]);
+                $rowData[0][15]= trim($rowData[0][15]);
                 //$rowData[0][0]= wo complete date, $rowData[0][4]= TECHID, $rowData[0][2]= WORK ORDER,$rowData[0][15]= TOTAL , $rowData[0][8]= WORK CODE 
                 $date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][0]));
                 $user_id = Billing::insertTechId($rowData[0][4]);
@@ -189,6 +199,10 @@ class BillingController extends Controller {
                 if ($row == 1) {
                     continue;
                 }
+                $rowData[0][5]= trim($rowData[0][5]);
+                $rowData[0][3] = trim($rowData[0][3]);
+                $rowData[0][4] = trim($rowData[0][4]);
+                $rowData[0][13] = trim($rowData[0][13]);
                 //$rowData[0][5]= wo complete date, $rowData[0][3]= TECHID, $rowData[0][4]= WORK ORDER,$rowData[0][13]= TOTAL 
                 $date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][5]));
                 $user_id = Billing::insertTechId($rowData[0][3]);

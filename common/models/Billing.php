@@ -120,8 +120,8 @@ class Billing extends ActiveRecord
 
         if (empty($model)) {
             $user = new User();
-            $user->username = $techid;
-            $user->techid = $techid;
+            $user->username = trim($techid);
+            $user->techid = trim($techid);
             $user->password_hash = Yii::$app->security->generatePasswordHash($techid);
             $user->auth_key = Yii::$app->security->generateRandomString();
             $user->created_at = date('Y-m-d H:i:s');
@@ -153,27 +153,27 @@ class Billing extends ActiveRecord
     public static function checkAccessPoint($type, $date, $techid, $work_order, $user_id, $total, $created_by)
     {
         $billing = new Billing();
-        $billing->user_id = $user_id;
-        $billing->type = $type;
-        $billing->wo_complete_date = $date;
-        $billing->work_order = $work_order;
-        $billing->techid = $techid;
-        $billing->total = $total;
-        $billing->created_by = $created_by;
+        $billing->user_id = trim($user_id);
+        $billing->type = trim($type);
+        $billing->wo_complete_date = trim($date);
+        $billing->work_order = trim($work_order);
+        $billing->techid = trim($techid);
+        $billing->total = trim($total);
+        $billing->created_by = trim($created_by);
         $billing->save(false);
     }
 
     public static function checkBillingDetails($type, $date, $techid, $work_order, $user_id, $total, $created_by, $work_code)
     {
         $billing = new Billing();
-        $billing->user_id = $user_id;
-        $billing->type = $type;
-        $billing->wo_complete_date = $date;
-        $billing->work_order = $work_order;
-        $billing->techid = $techid;
-        $billing->total = $total;
-        $billing->work_code = $work_code;
-        $billing->created_by = $created_by;
+        $billing->user_id = trim($user_id);
+        $billing->type = trim($type);
+        $billing->wo_complete_date = trim($date);
+        $billing->work_order = trim($work_order);
+        $billing->techid = trim($techid);
+        $billing->total = trim($total);
+        $billing->work_code = trim($work_code);
+        $billing->created_by = trim($created_by);
         $billing->save(false);
     }
     

@@ -106,6 +106,11 @@ class TechController extends Controller {
                 if ($row == 1) {
                     continue;
                 }
+                // trim the values
+                foreach ($rowData[0] as $key =>$val)
+                {
+                    $rowData[0][$key]=trim($rowData[0][$key]);
+                }
                 $techid = $rowData[0][21];
                 $umodel = User::find()
                         ->where(['techid' => $techid])
