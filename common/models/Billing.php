@@ -229,5 +229,12 @@ class Billing extends ActiveRecord
     public function getUser() {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+    public function getTechProfileInfo()
+    {
+        return $this->hasOne(TechProfile::className(), ['user_id' => 'user_id']);
+    }
+     public function getVendorInfo() {
+        return $this->hasOne(Vendor::className(), ['id' => 'vendor_id'])->via('techProfileInfo');
+    }
     
 }

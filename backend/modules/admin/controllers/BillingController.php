@@ -100,6 +100,16 @@ class BillingController extends Controller {
                 $model->file->saveAs($folder . $date . $file);
                 try {
                     $filename = $folder . $date . $file;
+                    /* Save Uploaded File Details - Start */
+                    $import_files_model = new \common\models\ImportFiles();
+                    $import_files_model->cat="Billing";
+                    $import_files_model->type=$model->type;
+                    $import_files_model->name=$date . $file;
+                    $import_files_model->path='web/uploads';
+                    $import_files_model->created_at=time();
+                    $import_files_model->created_by=Yii::$app->user->id;
+                    $import_files_model->save();
+                    /* Save Uploaded File Details - End */
                     $inputFileType = PHPExcel_IOFactory::identify($filename);
                     $objReader = PHPExcel_IOFactory::createReader($inputFileType);
                     $objReader->setReadDataOnly(true);

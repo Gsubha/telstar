@@ -2,6 +2,8 @@
 
 use common\models\Billing;
 use common\models\DlStudentSearch;
+use common\models\Vendor;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\ActiveForm;
@@ -36,16 +38,16 @@ $form = ActiveForm::begin([
                             <?php echo $form->field($model, 'keyword'); ?>                
                         </div>
                     </div>  
-<!--                    <div class="col-lg-4 col-md-4">
-                        <div class="form-group">
-                            <?php // echo $form->field($model, 'last_name'); ?>                  
-                        </div>
-                    </div>  -->
-<!--                    <div class="col-lg-4 col-md-4">
-                        <div class="form-group">
-                            <?php // echo $form->field($model, 'student_dob')->textInput(['class' => 'form-control datepicker']); ?>                  
-                        </div>
-                    </div> -->
+                    <!--                    <div class="col-lg-4 col-md-4">
+                                            <div class="form-group">
+                    <?php // echo $form->field($model, 'last_name'); ?>                  
+                                            </div>
+                                        </div>  -->
+                    <!--                    <div class="col-lg-4 col-md-4">
+                                            <div class="form-group">
+                    <?php // echo $form->field($model, 'student_dob')->textInput(['class' => 'form-control datepicker']); ?>                  
+                                            </div>
+                                        </div> -->
                     <div class="col-lg-4 col-md-4">
                         <div class="form-group">
                             <?php echo $form->field($model, 'started_at')->textInput(['class' => 'form-control datepicker'])->label('<i class="fa fa-calendar"></i> Start Date'); ?>                  
@@ -60,17 +62,25 @@ $form = ActiveForm::begin([
 
                     <div class="col-lg-4 col-md-4">
                         <div class="form-group">
-                            <?php $type= Billing::$typeList ?>
-                          <?= $form->field($model, 'type')->dropDownList($type,['class' => 'form-control', 'prompt' => '--- Select Type ---']) ?>             
+                            <?php $type = Billing::$typeList ?>
+                            <?= $form->field($model, 'type')->dropDownList($type, ['class' => 'form-control', 'prompt' => '--- Select Type ---']) ?>             
                         </div>
                     </div>  
-                   <!--<div class="col-lg-4 col-md-4">-->
-                        <!--<div class="form-group">-->
-                            <?php
-                            //echo $form->field($model, 'student.studentProfile.dob');
+                    <div class="col-lg-4 col-md-4">
+                        <div class="form-group">
+                            <?php 
+                            $vendors = ArrayHelper::map(Vendor::find()->where(['status' => 10])->orderBy('vendor_type')->all(), 'id', 'vendor_type');
+                            ?>
+                            <?= $form->field($model, 'vendor')->dropDownList($vendors, ['class' => 'form-control', 'prompt' => '--- Select Vendor ---']) ?>             
+                        </div>
+                    </div>  
+                    <!--<div class="col-lg-4 col-md-4">-->
+                    <!--<div class="form-group">-->
+                    <?php
+                    //echo $form->field($model, 'student.studentProfile.dob');
 //                            echo $form->field($model, 'searchstatus')->dropdownList(['1' => 'Not Assigned', '2' => 'Assigned (need to add remaining hours )', '5' => 'Assigned (no remaining hours )', '3' => 'Registered (paid)', '4' => 'Registered (not paid)'], ['prompt' => 'All']);
-                            ?>                  
-                        <!--</div>-->
+                    ?>                  
+                    <!--</div>-->
                     <!--</div>-->  
                     <div class="col-lg-1 col-md-1 reset1" style="margin-top:25px;"><?= Html::submitButton('Search', ['class' => 'btn btn-primary ']) ?></div>
                     <div class="col-lg-1 col-md-1 reset1" style="margin-top:25px;"><?= Html::a('Reset', ['index'], ['class' => 'btn btn-default']) ?></div>    

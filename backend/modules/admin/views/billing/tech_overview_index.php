@@ -113,16 +113,18 @@ if (!empty($dataProvider->getModels())) {
                             ?>
                         </select> entries per page
                     </label>
-                    <div id="Getprintval"> 
-                        <div class="col-lg-12 col-md-12">
+                    <div class="col-lg-12 col-md-12">
                             <div class="row">
+                    <div class="table-responsive">
+                    <div id="Getprintval"> 
+                        
                                 <?php
                                 $s1 = Billing::dateFormat($startdate);
                                 $e1 = Billing::dateFormat($enddate);
                                 $s2 = Billing::dateFormat($staticstart);
                                 $e2 = Billing::dateFormat($staticfinish);
                                 ?>
-                                <div class="table-responsive">
+                                
                                     <?=
                                     GridView::widget([
                                         'layout' => "<div class='panel panel-info'>"
@@ -138,7 +140,11 @@ if (!empty($dataProvider->getModels())) {
                                         'showFooter' => true,
                                         'columns' => [
                                             ['class' => 'yii\grid\SerialColumn'],
-                                            'techid',
+                                            //'techid',
+                                             [
+                                                'header' => 'Tech ID',
+                                                'attribute' => 'techid',
+                                            ],
                                             [
                                                 'header' => 'Total Jobs',
                                                 'attribute' => 'jobs',
@@ -188,7 +194,8 @@ $(document).ready(function(){
         var innerContents = document.getElementById("Getprintval").innerHTML;
         var popupWinindow = window.open('', '_blank', 'width=700,height=700,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
         popupWinindow.document.open();
-        popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="/webpanel/themes/admin/css/print.css" /></head><body onload="window.print()">' + innerContents + '</html>');    popupWinindow.document.close();  
+        var innerstyle='<style>.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{padding: 4px;font-size: 12px;line-height: initial;}h3, .h3, h4, .h4 {font-size: 16px;margin-top:2px;margin-bottom:5px}.panel-body {    padding: 5px 15px;}</style>';
+        popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="/webpanel/themes/admin/css/print.css" />' + innerstyle + '</head><body onload="window.print()">' + innerContents + '</html>');    popupWinindow.document.close();  
     });      
     
 });

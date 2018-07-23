@@ -16,14 +16,14 @@ class BillingSearch extends Billing {
     public $ended_at;
     public $keyword;
     public $pageSize,$price;
-
+    public $vendor;
     /**
      * {@inheritdoc}
      */
     public function rules() {
         return [
             [['id', 'user_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at'], 'integer'],
-            [['type', 'wo_complete_date', 'work_order', 'techid', 'work_code', 'date' ,'started_at', 'ended_at','keyword'], 'safe'],
+            [['type', 'wo_complete_date', 'work_order', 'techid', 'work_code', 'date' ,'started_at', 'ended_at','keyword','vendor'], 'safe'],
             [['total'], 'number'],
         ];
     }
@@ -44,21 +44,21 @@ class BillingSearch extends Billing {
      * @return ActiveDataProvider
      */
     public function search($params) {
-        $query = Billing::find();
-        $query->where("deleted_at =0");
+        $query = Billing::find()->joinWith(['techProfileInfo','vendorInfo']);
+        $query->where("billing.deleted_at =0");
          $this->load($params);
         // add conditions that should always apply here
         if ($this->started_at != "") {
             if ($this->ended_at == "") {
                 $this->ended_at = date('Y-m-d');
             }
-            $query->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . date('Y-m-d',strtotime($this->started_at)). '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' .date('Y-m-d',strtotime($this->ended_at)) . '"');
+            $query->andWhere('DATE_FORMAT(billing.wo_complete_date ,"%Y-%m-%d") >= "' . date('Y-m-d',strtotime($this->started_at)). '" AND DATE_FORMAT(billing.wo_complete_date,"%Y-%m-%d") <= "' .date('Y-m-d',strtotime($this->ended_at)) . '"');
             $datamod['BillingSearch']['started_at'] =date('Y-m-d',strtotime($this->started_at));
             $datamod['BillingSearch']['ended_at'] =date('Y-m-d',strtotime($this->ended_at));
         }else{
              $staticstart = date('Y-m-d',strtotime('last Sunday'));  
               $staticfinish = date('Y-m-d',strtotime('next Saturday'));
-                    $query->andWhere('DATE_FORMAT(wo_complete_date ,"%Y-%m-%d") >= "' . $staticstart. '" AND DATE_FORMAT(wo_complete_date,"%Y-%m-%d") <= "' .$staticfinish . '"');
+                    $query->andWhere('DATE_FORMAT(billing.wo_complete_date ,"%Y-%m-%d") >= "' . $staticstart. '" AND DATE_FORMAT(billing.wo_complete_date,"%Y-%m-%d") <= "' .$staticfinish . '"');
             $datamod['BillingSearch']['started_at'] =$staticstart;
             $datamod['BillingSearch']['ended_at'] =$staticfinish;
     
@@ -67,14 +67,18 @@ class BillingSearch extends Billing {
           if ($this->keyword != "") {
                $query->andWhere([
                         'or',
-                       ['like', 'work_code', $this->keyword],
-                       ['like', 'work_order', $this->keyword],
-                       ['like', 'techid', $this->keyword],
+                       ['like', 'billing.work_code', $this->keyword],
+                       ['like', 'billing.work_order', $this->keyword],
+                       ['like', 'billing.techid', $this->keyword],
                        ]);
         }
         if ($this->type != "") {
-            $query->andWhere( ['type' => $this->type]);  
+            $query->andWhere( ['billing.type' => $this->type]);  
             
+        }
+        if($this->vendor!='')
+        {
+            $query->andWhere(['vendor.id'=> $this->vendor]);
         }
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
