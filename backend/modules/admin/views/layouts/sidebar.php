@@ -50,6 +50,7 @@ use yii\widgets\Menu;
                         ['label' => '<i class="fa fa-angle-double-right"></i> <span>Tech Overview</span>', 'url' => ['billing/tech-overview']],                        
                     ]
                 ],
+                ['label' => '<i class="fa fa-upload"></i> <span>Upload Management</span>', 'url' => ['import-files/index']],
 
 
 //                    'url' => ['#'],

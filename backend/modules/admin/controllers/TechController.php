@@ -79,7 +79,7 @@ class TechController extends Controller {
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new \common\models\ImportFiles();
                     $import_files_model->cat="Tech";
-                    $import_files_model->type="-";
+                    $import_files_model->type="Profile";
                     $import_files_model->name=$date . $file;
                     $import_files_model->path='web/uploads/techprofiles';
                     $import_files_model->created_at=time();

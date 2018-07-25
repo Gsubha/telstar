@@ -103,7 +103,21 @@ class BillingController extends Controller {
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new \common\models\ImportFiles();
                     $import_files_model->cat="Billing";
-                    $import_files_model->type=$model->type;
+                    $imptype='';
+                    switch($model->type)
+                    {
+                        case "access_point_details":
+                            $imptype="Access Point Details";
+                            break;
+                        case "billing_details":
+                            $imptype="Billing Details";
+                            break;
+                        case "all_digital_details":
+                            $imptype="Digital Details";
+                            break;
+                        
+                    }
+                    $import_files_model->type=$imptype;
                     $import_files_model->name=$date . $file;
                     $import_files_model->path='web/uploads';
                     $import_files_model->created_at=time();
