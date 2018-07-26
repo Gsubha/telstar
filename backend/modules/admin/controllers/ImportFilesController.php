@@ -120,10 +120,16 @@ class ImportFilesController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($id,$path='')
     {
-        //$this->findModel($id)->delete();
-
+        
+        if($this->findModel($id)->delete())
+        {
+            $filepath = Yii::$app->basePath . "/$path";
+            if (is_file($filepath)) {
+               unlink($filepath);
+            }
+        }
         return $this->redirect(['index']);
     }
 
@@ -148,7 +154,12 @@ class ImportFilesController extends Controller
         $url = $_GET["url"];
 
         $path = Yii::$app->basePath . "/$url";
-
-        Yii::$app->response->sendFile($path);
+        
+        if (is_file($path)) {
+           Yii::$app->response->sendFile($path);
+        } else {
+            Yii::$app->session->setFlash('error', 'File is not Exists');
+           return $this->redirect(['index']);
+        }
     }
 }

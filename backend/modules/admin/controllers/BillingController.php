@@ -96,10 +96,10 @@ class BillingController extends Controller {
             if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
                 $date = date('Y-m-d H:i:s');
                 $file = $model->file->name;
-                $folder = Yii::$app->basePath . '/web/uploads/';
-                $model->file->saveAs($folder . $date . $file);
+                $folder = Yii::$app->basePath . '/web/uploads/billings/';
+                $model->file->saveAs($folder . time().'_'. $file);
                 try {
-                    $filename = $folder . $date . $file;
+                    $filename = $folder . time().'_'. $file;
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new \common\models\ImportFiles();
                     $import_files_model->cat="Billing";
@@ -118,8 +118,8 @@ class BillingController extends Controller {
                         
                     }
                     $import_files_model->type=$imptype;
-                    $import_files_model->name=$date . $file;
-                    $import_files_model->path='web/uploads';
+                    $import_files_model->name=time()."_". $file;
+                    $import_files_model->path='web/uploads/billings';
                     $import_files_model->created_at=time();
                     $import_files_model->created_by=Yii::$app->user->id;
                     $import_files_model->save();
