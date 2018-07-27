@@ -72,9 +72,15 @@ class TechOfficial extends \yii\db\ActiveRecord {
 
     public static function getratecode($rate_type, $rate_value){
         if($rate_type=="In"){
-            return self::$inhouseList[$rate_value];
+            if(!isset(self::$inhouseList[$rate_value]))
+                return 0;
+            else
+              return self::$inhouseList[$rate_value];
         }else if($rate_type=="Cp"){
-            return self::$corporateList[$rate_value];
+            if(!isset(self::$corporateList[$rate_value]))
+                return 0;
+            else
+              return self::$corporateList[$rate_value];
         }else{
             return 0;
         }

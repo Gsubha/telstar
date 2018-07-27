@@ -3,6 +3,8 @@
 use common\models\Billing;
 use common\models\BillingSearch;
 use common\models\TechOfficial;
+use kartik\export\ExportMenu;
+use kartik\grid\GridView as GridView2;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -102,10 +104,10 @@ if (!empty($dataProvider->getModels())) {
                     <!--<div class="row">-->
                     <?php echo $this->render('_search', ['model' => $searchModel]); ?>
                     <!--</div>-->
-                    <?php if ($sumofamount != 0) { ?>
-                        <a href="javascript:void(0);" id="printdiv" class="btn m-b-xs  btn-success pull-right"> <i class="fa fa-print"></i>  Print</a>    
-                        <div class="col-lg-12 col-md-12">&nbsp;</div>
-                    <?php } ?>
+                    <?php /* if ($sumofamount != 0) { ?>
+                      <a href="javascript:void(0);" id="printdiv" class="btn m-b-xs  btn-success pull-right"> <i class="fa fa-print"></i>  Print</a>
+                      <div class="col-lg-12 col-md-12">&nbsp;</div>
+                      <?php } */ ?>
                     <!--</div>-->
                     <?php
 //                            echo "<pre>";
@@ -114,7 +116,181 @@ if (!empty($dataProvider->getModels())) {
                     $pagesize = $dataProvider->pagination->pageSize;
                     $pageoptions = Yii::$app->myclass->pageOptions(); //Billing::$pageOptions;
                     ?>
-                    <label style="color:#31708f;float: right;font-size: 1em;">Show 
+<!--                    <label style="color:#31708f;float: right;font-size: 1em;">Show 
+                        <select name="pagesize" id="pagesize" style="padding: 2px 2px;background:white;border: 1px solid #31708f;">
+                            <?php
+                            foreach ($pageoptions as $key => $val) {
+                                if ($pagesize == $key)
+                                    echo "<option selected>" . $val . "</option>";
+                                else
+                                    echo "<option>" . $val . "</option>";
+                            }
+                            ?>
+                        </select> entries per page
+                    </label>-->
+                    <div class="col-lg-12 col-md-12">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <?php
+                                $s1 = Billing::dateFormat($startdate);
+                                $e1 = Billing::dateFormat($enddate);
+                                $s2 = Billing::dateFormat($staticstart);
+                                $e2 = Billing::dateFormat($staticfinish);
+
+                                $gridColumns = [
+                                    ['class' => 'yii\grid\SerialColumn'],
+                                    [
+                                        'label' => 'Type',
+                                        'attribute' => 'type',
+                                        'format' => 'raw',
+                                        'value' => function ($model) {
+                                            if ($model->type) {
+                                                if ($model->type == 'billing_details') {
+                                                    $sc_stat = '<span class="label label-danger">Billing Details</span>';
+                                                } elseif ($model->type == 'all_digital_details') {
+                                                    $sc_stat = '<span class="label label-success">All Digital Details</span>';
+                                                } else {
+                                                    $sc_stat = '<span class="label label-info">Access Point Details</span>';
+                                                }
+                                                return $sc_stat;
+                                            }
+                                        },
+                                    ],
+                                    ['label' => 'Tech ID', 'attribute' => 'techid', 'contentOptions' => ['style' => 'width: 100px;']],
+                                    [
+                                        'label' => 'Wo Complete Date',
+                                        'attribute' => 'wo_complete_date',
+                                        'format' => ['date', 'php:m/d/Y'],
+                                    ],
+                                    ['label' => 'Work Code', 'attribute' => 'work_code'],
+                                    [
+                                        'label' => 'Work Order',
+                                        'attribute' => 'work_order',
+                                        'format' => 'raw',
+                                    ],
+                                    /* [
+                                      'header' => 'Price',
+                                      'attribute' => 'total',
+                                      'format' => 'raw',
+                                      'value' => function ($model) {
+                                      $sc_stat = '$' . $model->total;
+                                      return $sc_stat;
+                                      },
+                                      'footer' => "<strong>" . $cost . "</strong>",
+                                      ], */
+                                    [
+                                        'label' => 'Vendor',
+                                        'attribute' => 'vendorShortName',
+                                        'format' => 'raw',
+                                        'value' => function ($model) {
+                                            if (isset($model->techProfileInfo->vendor->vendor_type))
+                                                return strtoupper(substr($model->techProfileInfo->vendor->vendor_type, 0, 3));
+                                            else
+                                                return "-";
+                                        },
+                                    ],
+                                    [
+                                        'label' => 'Rate Code Type',
+                                        'attribute' => 'type',
+                                        'format' => 'raw',
+                                        'footer' => "<strong>Total Price:</strong>",
+                                        'value' => function ($model) {
+                                            $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                            if ($tech_offcl) {
+                                                return $tech_offcl->rate_code_type . ' ' . $tech_offcl->rate_code_val;
+                                            } else {
+                                                return 'not set';
+                                            }
+                                        },
+                                    ],
+                                    /* [
+                                      'header' => 'Rate Code Percentage',
+                                      'attribute' => 'addcode',
+                                      'format' => 'raw',
+                                      'value' => function ($model) {
+                                      $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                      if ($tech_offcl) {
+                                      return TechOfficial::getratecode($tech_offcl->rate_code_type, $tech_offcl->rate_code_val) . "%";
+                                      } else {
+                                      return '-';
+                                      }
+                                      },
+                                      'footer' => "<strong>Total Due Amount:</strong>",
+                                      ], */
+                                    [
+                                        'label' => 'Total',
+                                        'attribute' => 'tech_amount',
+                                        'format' => 'raw',
+                                        'value' => function ($model) {
+
+                                            $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
+                                            if ($tech_offcl) {
+                                                $val = TechOfficial::getratecode($tech_offcl->rate_code_type, $tech_offcl->rate_code_val);
+                                                $total_amount = ($model->total) * ($val / 100);
+                                                return '$' . number_format((float) $total_amount, 2, '.', '');
+                                            } else {
+                                                return '$' . $model->total;
+                                            }
+                                        },
+                                        'footer' => "<strong>" . $tech_total_amount . "</strong>",
+                                    ],
+                                    ['class' => 'yii\grid\ActionColumn',
+                                        'template' => '{delete}',
+                                        'buttons' => [
+                                            'delete' => function($url, $model) {
+//                            if ($model->dlStudentCourses->scr_paid_status == "1" && $model->dlStudentCourses->scr_completed_status == "0") {
+                                                return Html::a('<i class="fa fa-fw fa-trash"></i>', ['billing/delete', 'id' => $model->id], [
+                                                            'class' => 'hidden-print',
+                                                            'data' => [
+                                                                'confirm' => 'Are you sure you want to delete this data?',
+                                                                'method' => 'post',
+                                                            ],
+                                                ]);
+//                            }
+                                            },
+                                        ],
+                                        'contentOptions' => ['class' => 'hidden-print'],
+                                        'headerOptions' => ['class' => 'hidden-print'],
+                                    ],
+                                ];
+
+// Renders a export dropdown menu
+                                ?>
+                               
+                                <div class="export-button">
+                                     <?php if ($sumofamount != 0) { ?>
+                                    <a href="javascript:void(0);" id="printdiv" class="btn m-b-xs  btn-success"> <i class="fa fa-print"></i>  Print</a>    
+                                    <!--<div class="col-lg-12 col-md-12">&nbsp;</div>-->
+                                    <?php
+                                    echo ExportMenu::widget([
+                                        'dataProvider' => $dataProvider,
+                                        'columns' => $gridColumns,
+                                        'target' => '_self',
+                                        'fontAwesome' => true,
+                                        'asDropdown' => false,
+                                        /* 'dropdownOptions' => [
+                                          'class' => 'btn btn-success',
+                                          'label' => 'Export Report To',
+                                          'title' => 'Export Billing Report',
+                                          'icon' => '<i class="fa fa-paper-plane" aria-hidden="true"></i>',
+                                          ], */
+                                        'showColumnSelector' => false,
+                                        //
+                                        'filename' => 'Billing_Report_' . time(),
+                                        'showConfirmAlert' => false,
+                                        //'showConfirmAlert'=>'false',
+                                        'exportConfig' => [
+                                            ExportMenu::FORMAT_CSV => ['label' => 'Export as Csv', 'options' => ['class' => 'exp-csv btn btn-warning'], 'icon' => 'file-code-o'],
+                                            ExportMenu::FORMAT_HTML => false,
+                                            ExportMenu::FORMAT_TEXT => false,
+                                            ExportMenu::FORMAT_PDF => false, //['label' => 'Export as PDF'],
+                                            ExportMenu::FORMAT_EXCEL => false,
+                                            ExportMenu::FORMAT_EXCEL_X => false,
+                                        ],
+                                    ]);
+                                    ?>
+                                    <?php } ?>
+                                    <label style="color:#31708f;float: right;font-size: 1em;">Show 
                         <select name="pagesize" id="pagesize" style="padding: 2px 2px;background:white;border: 1px solid #31708f;">
                             <?php
                             foreach ($pageoptions as $key => $val) {
@@ -126,19 +302,11 @@ if (!empty($dataProvider->getModels())) {
                             ?>
                         </select> entries per page
                     </label>
-                    <div class="col-lg-12 col-md-12">
-                        <div class="row">
-                            <div class="table-responsive">
+                                </div>
+                                    
                                 <div id="Getprintval"> 
                                     <?php
-                                    $s1 = Billing::dateFormat($startdate);
-                                    $e1 = Billing::dateFormat($enddate);
-                                    $s2 = Billing::dateFormat($staticstart);
-                                    $e2 = Billing::dateFormat($staticfinish);
-                                    ?>
-
-                                    <?=
-                                    GridView::widget([
+                                    echo GridView2::widget([
                                         'layout' => "<div class='panel panel-info'>"
                                         . "<div class='panel-heading'>"
                                         . "<div class='pull-right'>{summary}</div>"
@@ -150,132 +318,8 @@ if (!empty($dataProvider->getModels())) {
                                         . "  {items}{pager}</div></div>",
                                         'dataProvider' => $dataProvider,
                                         'showFooter' => true,
-                                        'columns' => [
-                                            ['class' => 'yii\grid\SerialColumn'],
-                                            [
-                                                'header' => 'Type',
-                                                'attribute' => 'type',
-                                                'format' => 'raw',
-                                                'value' => function ($model) {
-                                                    if ($model->type) {
-                                                        if ($model->type == 'billing_details') {
-                                                            $sc_stat = '<span class="label label-danger">Billing Details</span>';
-                                                        } elseif ($model->type == 'all_digital_details') {
-                                                            $sc_stat = '<span class="label label-success">All Digital Details</span>';
-                                                        } else {
-                                                            $sc_stat = '<span class="label label-info">Access Point Details</span>';
-                                                        }
-                                                        return $sc_stat;
-                                                    }
-                                                },
-                                            ],
-                                            ['header' => 'Tech ID', 'attribute' => 'techid'],
-                                            [
-                                                'header' => 'Wo Complete Date',
-                                                'attribute' => 'wo_complete_date',
-                                                'format' => ['date', 'php:m/d/Y'],
-                                            ],
-                                            ['header' => 'Work Code', 'attribute' => 'work_code'],
-                                            [
-                                                'header' => 'Work Order',
-                                                'attribute' => 'work_order',
-                                                'format' => 'raw',
-                                            ],
-                                            /* [
-                                              'header' => 'Price',
-                                              'attribute' => 'total',
-                                              'format' => 'raw',
-                                              'value' => function ($model) {
-                                              $sc_stat = '$' . $model->total;
-                                              return $sc_stat;
-                                              },
-                                              'footer' => "<strong>" . $cost . "</strong>",
-                                              ], */
-                                            [
-                                                'header' => 'Vendor',
-                                                'attribute' => 'vendorShortName',
-                                                'format' => 'raw',
-                                                'value' => function ($model) {
-                                                    if (isset($model->techProfileInfo->vendor->vendor_type))
-                                                        return strtoupper(substr($model->techProfileInfo->vendor->vendor_type, 0, 3));
-                                                    else
-                                                        return "-";
-                                                },
-                                            ],
-                                            [
-                                                'header' => 'Rate Code Type',
-                                                'attribute' => 'type',
-                                                'format' => 'raw',
-                                                'footer' => "<strong>Total Price:</strong>",
-                                                'value' => function ($model) {
-                                                    $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
-                                                    if ($tech_offcl) {
-                                                        return $tech_offcl->rate_code_type . ' ' . $tech_offcl->rate_code_val;
-                                                    } else {
-                                                        return 'not set';
-                                                    }
-                                                },
-                                            ],
-                                            /* [
-                                              'header' => 'Rate Code Percentage',
-                                              'attribute' => 'addcode',
-                                              'format' => 'raw',
-                                              'value' => function ($model) {
-                                              $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
-                                              if ($tech_offcl) {
-                                              return TechOfficial::getratecode($tech_offcl->rate_code_type, $tech_offcl->rate_code_val) . "%";
-                                              } else {
-                                              return '-';
-                                              }
-                                              },
-                                              'footer' => "<strong>Total Due Amount:</strong>",
-                                              ], */
-                                            [
-                                                'header' => 'Total',
-                                                'attribute' => 'tech_amount',
-                                                'format' => 'raw',
-                                                'value' => function ($model) {
-
-                                                    $tech_offcl = TechOfficial::find()->where(['user_id' => $model->user_id])->one();
-                                                    if ($tech_offcl) {
-                                                        $val = TechOfficial::getratecode($tech_offcl->rate_code_type, $tech_offcl->rate_code_val);
-                                                        $total_amount = ($model->total) * ($val / 100);
-                                                        return '$' . number_format((float) $total_amount, 2, '.', '');
-                                                    } else {
-                                                        return '$' . $model->total;
-                                                    }
-                                                },
-                                                'footer' => "<strong>" . $tech_total_amount . "</strong>",
-                                            ],
-                                            ['class' => 'yii\grid\ActionColumn',
-                                                'template' => '{delete}',
-                                                'buttons' => [
-//                                    'view' => function ($url, $model) {
-////                                        $url = Url::toRoute('users/view?id=' . $model->id);
-//                                        return Html::a('<span class="fa-eye"></span>', ['users/view?id='. $model->id], ['class' => 'modelButton', 'title' => 'View Student']
-//                                        );
-//                                    },
-//                                    'update' => function ($url, $model) {
-////                                        $url = Url::toRoute('users/edit?id=' . $model->id);
-//                                        return Html::a('<i class="fa fa-fw fa-edit"></i>', ['billing/update?id=' . $model->id], ['class' => 'bmodelButton', 'title' => 'Update Student']
-//                                        );
-//                                    },
-                                                    'delete' => function($url, $model) {
-//                            if ($model->dlStudentCourses->scr_paid_status == "1" && $model->dlStudentCourses->scr_completed_status == "0") {
-                                                        return Html::a('<i class="fa fa-fw fa-trash"></i>', ['billing/delete', 'id' => $model->id], [
-                                                                    'class' => 'hidden-print',
-                                                                    'data' => [
-                                                                        'confirm' => 'Are you sure you want to delete this data?',
-                                                                        'method' => 'post',
-                                                                    ],
-                                                        ]);
-//                            }
-                                                    },
-                                                ],
-                                                'contentOptions' => ['class' => 'hidden-print'],
-                                                'headerOptions' => ['class' => 'hidden-print'],
-                                            ],
-                                        ],
+                                        'responsive' => true,
+                                        'columns' => $gridColumns,
                                     ]);
                                     ?>
                                 </div>

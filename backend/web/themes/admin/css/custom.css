@@ -10,3 +10,11 @@
 .direct-chat-messages{
     height: 280px !important;
 }
+
+.export-button a, .export-button i{
+    color:#fff;
+}
+#Getprintval {
+    margin-top: 15px;
+    clear: both;
+}

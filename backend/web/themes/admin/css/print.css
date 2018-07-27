@@ -9,4 +9,9 @@
 .action_column, .button-column{display:none;}
 .dailycash{display:block !important;}
 .dailycash{margin-bottom: 10px; margin-top: 2px;}
-
+@media print {
+  a[href]:after { content: none !important;}
+  .rc-handle-container, .btn-group {
+    display: none !important;
+}
+}
