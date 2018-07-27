@@ -88,6 +88,13 @@ class BillingSearch extends Billing {
 //                'params' => $datamod
             ],
         ]);
+        
+        $dataProvider->sort->attributes['vendorShortName'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['vendor.vendor_type' => SORT_ASC],
+            'desc' => ['vendor.vendor_type' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -164,7 +171,7 @@ class BillingSearch extends Billing {
 //                'params' => $datamod
             ],
         ]);
-
+        
         $this->load($params);
 
         if (!$this->validate()) {
@@ -196,12 +203,12 @@ class BillingSearch extends Billing {
     }
     
     public function techOverviewSearch($params) {
-        $query = Billing::find()->joinWith(['user','techOfficial']);
+        $query = Billing::find()->joinWith(['user','techOfficial','vendorInfo']);
         if($this->location!='' || $this->vendor!=''){
             $query->joinWith('techProfile');
         }
         $query->select(['billing.user_id','user.username','billing.techid','count(billing.id) as jobs','SUM(ROUND((billing.total),2)) AS price','SUM(ROUND(((billing.total)*(tech_official.rate_percent)/100),2)) AS total_dAmt','tech_official.rate_code_val', 'tech_official.rate_code_type']);
-        $query->where("deleted_at =0");
+        $query->where("billing.deleted_at =0");
          $this->load($params);
          if($this->location!='')
          {
@@ -242,7 +249,13 @@ class BillingSearch extends Billing {
 //                'params' => $datamod
             ],
         ]);
-
+        $dataProvider->sort->attributes['vendorShortName'] = [
+            // The tables are the ones our relation are configured to
+            // in my case they are prefixed with "tbl_"
+            'asc' => ['vendor.vendor_type' => SORT_ASC],
+            'desc' => ['vendor.vendor_type' => SORT_DESC],
+        ];
+        
         $this->load($params);
 
         if (!$this->validate()) {
