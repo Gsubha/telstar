@@ -3,6 +3,7 @@
 namespace backend\modules\admin\controllers;
 
 use common\models\Billing;
+use common\models\ImportFiles;
 use common\models\Location;
 use common\models\Tech;
 use common\models\TechOfficial;
@@ -70,19 +71,20 @@ class TechController extends Controller {
 
             if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
                 $date = date('Y-m-d H:i:s');
+                $time=time();
                 $file = $model->file->name;
                 $folder = Yii::$app->basePath . '/web/uploads/techprofiles/';
-                $model->file->saveAs($folder . $date . $file);
+                $model->file->saveAs($folder . $time.'_'. $file);
                 //return $this->redirect(['index']);
                 try {
-                    $filename = $folder . $date . $file;
+                    $filename = $folder . $time.'_'. $file;
                     /* Save Uploaded File Details - Start */
-                    $import_files_model = new \common\models\ImportFiles();
+                    $import_files_model = new ImportFiles();
                     $import_files_model->cat="Tech";
                     $import_files_model->type="Profile";
-                    $import_files_model->name=$date . $file;
+                    $import_files_model->name=$time.'_'. $file;
                     $import_files_model->path='web/uploads/techprofiles';
-                    $import_files_model->created_at=time();
+                    $import_files_model->created_at=$time;
                     $import_files_model->created_by= Yii::$app->user->id;
                     $import_files_model->save();
                     /* Save Uploaded File Details - End */

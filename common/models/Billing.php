@@ -150,7 +150,7 @@ class Billing extends ActiveRecord
 
     }
 
-    public static function checkAccessPoint($type, $date, $techid, $work_order, $user_id, $total, $created_by)
+    public static function checkAccessPoint($type, $date, $techid, $work_order, $user_id, $total, $created_by,$upld_id)
     {
         $billing = new Billing();
         $billing->user_id = trim($user_id);
@@ -160,10 +160,11 @@ class Billing extends ActiveRecord
         $billing->techid = trim($techid);
         $billing->total = trim($total);
         $billing->created_by = trim($created_by);
+        $billing->upload_id = $upld_id;
         $billing->save(false);
     }
 
-    public static function checkBillingDetails($type, $date, $techid, $work_order, $user_id, $total, $created_by, $work_code)
+    public static function checkBillingDetails($type, $date, $techid, $work_order, $user_id, $total, $created_by, $work_code,$upld_id)
     {
         $billing = new Billing();
         $billing->user_id = trim($user_id);
@@ -174,6 +175,7 @@ class Billing extends ActiveRecord
         $billing->total = trim($total);
         $billing->work_code = trim($work_code);
         $billing->created_by = trim($created_by);
+        $billing->upload_id = $upld_id;
         $billing->save(false);
     }
     

@@ -97,9 +97,11 @@ class BillingController extends Controller {
                 $date = date('Y-m-d H:i:s');
                 $file = $model->file->name;
                 $folder = Yii::$app->basePath . '/web/uploads/billings/';
-                $model->file->saveAs($folder . time().'_'. $file);
+                $time=time();
+                $upld_id=NULL;
+                $model->file->saveAs($folder . $time.'_'. $file);
                 try {
-                    $filename = $folder . time().'_'. $file;
+                    $filename = $folder . $time.'_'. $file;
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new \common\models\ImportFiles();
                     $import_files_model->cat="Billing";
@@ -118,11 +120,12 @@ class BillingController extends Controller {
                         
                     }
                     $import_files_model->type=$imptype;
-                    $import_files_model->name=time()."_". $file;
+                    $import_files_model->name=$time."_". $file;
                     $import_files_model->path='web/uploads/billings';
-                    $import_files_model->created_at=time();
+                    $import_files_model->created_at=$time;
                     $import_files_model->created_by=Yii::$app->user->id;
-                    $import_files_model->save();
+                    if($import_files_model->save())
+                        $upld_id = Yii::$app->db->getLastInsertID();
                     /* Save Uploaded File Details - End */
                     $inputFileType = PHPExcel_IOFactory::identify($filename);
                     $objReader = PHPExcel_IOFactory::createReader($inputFileType);
@@ -133,7 +136,7 @@ class BillingController extends Controller {
                 }
 
                 $sheet = $objPHPExcel->getSheet(0);
-                $this->findImport($sheet, $model->type);
+                $this->findImport($sheet, $model->type,$upld_id);
 //                    die('okay');
             } else {
                 \Yii::$app->session->setFlash('error', 'Only files with these extensions are allowed: xls, xlsx');
@@ -152,7 +155,7 @@ class BillingController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function findImport($sheet, $type) {
+    public function findImport($sheet, $type,$upld_id=NULL) {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
 //        $count=0;
@@ -178,7 +181,7 @@ class BillingController extends Controller {
                         ->andWhere(['user_id' => $user_id])
                         ->one();
                 if (empty($model)) {
-                    $check = Billing::checkAccessPoint($type, $date, $rowData[0][1], $rowData[0][2], $user_id, $rowData[0][3], Yii::$app->user->id);
+                    $check = Billing::checkAccessPoint($type, $date, $rowData[0][1], $rowData[0][2], $user_id, $rowData[0][3], Yii::$app->user->id,$upld_id);
                 } else {
                     $model->total = $rowData[0][3];
                     $model->save(false);
@@ -210,7 +213,7 @@ class BillingController extends Controller {
                         ->andWhere(['work_code' => $rowData[0][8]])
                         ->one();
                 if (empty($model)) {
-                    $check = Billing::checkBillingDetails($type, $date, $rowData[0][4], $rowData[0][2], $user_id, $rowData[0][15], Yii::$app->user->id, $rowData[0][8]);
+                    $check = Billing::checkBillingDetails($type, $date, $rowData[0][4], $rowData[0][2], $user_id, $rowData[0][15], Yii::$app->user->id, $rowData[0][8],$upld_id);
                 } else {
                     $model->total = $rowData[0][15];
                     $model->save(false);
@@ -239,7 +242,7 @@ class BillingController extends Controller {
                         ->one();
 
                 if (empty($model)) {
-                    $check = Billing::checkAccessPoint($type, $date, $rowData[0][3], $rowData[0][4], $user_id, $rowData[0][13], Yii::$app->user->id);
+                    $check = Billing::checkAccessPoint($type, $date, $rowData[0][3], $rowData[0][4], $user_id, $rowData[0][13], Yii::$app->user->id,$upld_id);
                 } else {
 
                     $model->total = $rowData[0][13];

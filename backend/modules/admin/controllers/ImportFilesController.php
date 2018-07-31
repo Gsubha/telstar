@@ -2,6 +2,7 @@
 
 namespace backend\modules\admin\controllers;
 
+use common\models\Billing;
 use common\models\ImportFiles;
 use common\models\ImportFilesSearch;
 use Yii;
@@ -125,6 +126,7 @@ class ImportFilesController extends Controller
         
         if($this->findModel($id)->delete())
         {
+            Billing::deleteAll(['upload_id'=>$id]);
             $filepath = Yii::$app->basePath . "/$path";
             if (is_file($filepath)) {
                unlink($filepath);
