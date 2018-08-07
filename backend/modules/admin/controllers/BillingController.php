@@ -160,9 +160,11 @@ class BillingController extends Controller {
         $highestColumn = $sheet->getHighestColumn();
 //        $count=0;
         if ($type == 'access_point_details' && $highestColumn == 'D') {
+            $error_count=0;
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                if ($row == 1) {
+                if ($row == 1 || (empty(trim($rowData[0][0])))) {
+                    $error_count++;
                     continue;
                 }
                 $rowData[0][0]= trim($rowData[0][0]);
@@ -188,12 +190,16 @@ class BillingController extends Controller {
                 }
 //                 $count++;
             }
-//             Yii::$app->getSession()->setFlash('success', 'You have added '.$count.' records');
+            if(($error_count-1)>0)
+                 \Yii::$app->session->setFlash('warning', $error_count.' records are not inserted due to empty fields or missing mandatory fields');
+            
             return $this->redirect(['index']);
         } else if ($type == 'billing_details' && $highestColumn == 'P') {
+            $error_count=0;
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                if ($row == 1) {
+                if ($row == 1 || (empty(trim($rowData[0][0]))) || (empty(trim($rowData[0][4]))) || (empty(trim($rowData[0][2]))) || (empty(trim($rowData[0][15])))) {
+                    $error_count++;
                     continue;
                 }
                 $rowData[0][0]= trim($rowData[0][0]);
@@ -219,11 +225,16 @@ class BillingController extends Controller {
                     $model->save(false);
                 }
             }
+            if(($error_count-1)>0)
+                 \Yii::$app->session->setFlash('warning', $error_count.' records are not inserted due to empty fields or missing mandatory fields');
+            
             return $this->redirect(['index']);
         } else if ($type == 'all_digital_details' && $highestColumn == 'N') {
+            $error_count=0;
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                if ($row == 1) {
+                 if ($row == 1 || (empty(trim($rowData[0][3]))) || (empty(trim($rowData[0][5])))) {
+                    $error_count++;
                     continue;
                 }
                 $rowData[0][5]= trim($rowData[0][5]);
@@ -250,6 +261,9 @@ class BillingController extends Controller {
                     $model->save(false);
                 }
             }
+            if(($error_count-1)>0)
+                 \Yii::$app->session->setFlash('warning', $error_count.' records are not inserted due to empty fields or missing mandatory fields');
+            
             return $this->redirect(['index']);
         } else {
             \Yii::$app->session->setFlash('error', 'Type and excelsheet format should be same');
