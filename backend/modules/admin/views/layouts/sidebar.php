@@ -51,6 +51,9 @@ use yii\widgets\Menu;
                     ]
                 ],
                 ['label' => '<i class="fa fa-upload"></i> <span>Upload Management</span>', 'url' => ['import-files/index']],
+                ['label' => '<i class="fa fa-users"></i> <span>CSR Management</span>', 'url' => ['tech/sadmin']],
+                ['label' => '<i class="fa fa-align-justify"></i> <span>My Works</span>', 'url' => ['tech/myworks']],
+                
 
 
 //                    'url' => ['#'],

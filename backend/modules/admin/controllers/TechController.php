@@ -36,7 +36,7 @@ class TechController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download'],
+                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download','techlist','myworks','sadmin'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -116,7 +116,7 @@ class TechController extends Controller {
         if ($highestColumn == 'AB') {
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                if ($row == 1) {
+                if ($row == 1 || (empty(trim($rowData[0][21])))) {
                     continue;
                 }
                 // trim the values
@@ -398,6 +398,21 @@ class TechController extends Controller {
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+    
+    /* Mocukp Pages */
+    public function actionTechlist()
+    {
+         return $this->render('/mockups/tech_list');
+    }
+    
+    public function actionMyworks()
+    {
+         return $this->render('/mockups/myworks');
+    }
+    public function actionSadmin()
+    {
+         return $this->render('/mockups/sub_admin_list');
     }
 
 }
