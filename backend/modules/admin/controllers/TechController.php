@@ -6,6 +6,7 @@ use common\models\Billing;
 use common\models\ImportFiles;
 use common\models\Location;
 use common\models\Tech;
+use common\models\TechDeductionsSearch;
 use common\models\TechOfficial;
 use common\models\TechProfile;
 use common\models\TechSearch;
@@ -24,9 +25,11 @@ use yii\web\UploadedFile;
 //use yii\web\User;
 //use yii\web\User;
 
-class TechController extends Controller {
+class TechController extends Controller
+{
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             'access' => [
                 'class' => AccessControl::className(),
@@ -36,7 +39,7 @@ class TechController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download','techlist','myworks','sadmin'],
+                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download', 'techlist', 'myworks', 'sadmin'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -51,19 +54,21 @@ class TechController extends Controller {
         ];
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $searchModel = new TechSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $pagesize = (isset($_GET['pagesize'])) ? $_GET['pagesize'] : 50;
         $dataProvider->pagination->pageSize = $pagesize;
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
-    public function actionImport() {
+    public function actionImport()
+    {
         $model = new Tech();
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -71,24 +76,24 @@ class TechController extends Controller {
 
             if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
                 $date = date('Y-m-d H:i:s');
-                $time=time();
+                $time = time();
                 $file = $model->file->name;
                 $folder = Yii::$app->basePath . '/web/uploads/techprofiles/';
-                $model->file->saveAs($folder . $time.'_'. $file);
+                $model->file->saveAs($folder . $time . '_' . $file);
                 //return $this->redirect(['index']);
                 try {
-                    $filename = $folder . $time.'_'. $file;
+                    $filename = $folder . $time . '_' . $file;
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new ImportFiles();
-                    $import_files_model->cat="Tech";
-                    $import_files_model->type="Profile";
-                    $import_files_model->name=$time.'_'. $file;
-                    $import_files_model->path='web/uploads/techprofiles';
-                    $import_files_model->created_at=$time;
-                    $import_files_model->created_by= Yii::$app->user->id;
+                    $import_files_model->cat = "Tech";
+                    $import_files_model->type = "Profile";
+                    $import_files_model->name = $time . '_' . $file;
+                    $import_files_model->path = 'web/uploads/techprofiles';
+                    $import_files_model->created_at = $time;
+                    $import_files_model->created_by = Yii::$app->user->id;
                     $import_files_model->save();
                     /* Save Uploaded File Details - End */
-                    
+
                     $inputFileType = PHPExcel_IOFactory::identify($filename);
                     $objReader = PHPExcel_IOFactory::createReader($inputFileType);
                     $objReader->setReadDataOnly(true);
@@ -106,11 +111,12 @@ class TechController extends Controller {
         }
 
         return $this->render('import', [
-                    'model' => $model,
+            'model' => $model,
         ]);
     }
 
-    public function findImport($sheet) {
+    public function findImport($sheet)
+    {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
         if ($highestColumn == 'AB') {
@@ -120,14 +126,13 @@ class TechController extends Controller {
                     continue;
                 }
                 // trim the values
-                foreach ($rowData[0] as $key =>$val)
-                {
-                    $rowData[0][$key]=trim($rowData[0][$key]);
+                foreach ($rowData[0] as $key => $val) {
+                    $rowData[0][$key] = trim($rowData[0][$key]);
                 }
                 $techid = $rowData[0][21];
                 $umodel = User::find()
-                        ->where(['techid' => $techid])
-                        ->one();
+                    ->where(['techid' => $techid])
+                    ->one();
                 if (!empty($umodel))
                     $uid = $umodel->id;
                 else
@@ -229,7 +234,7 @@ class TechController extends Controller {
                     if (isset($rate_type_value[1])) {
                         $tech_offcl_imp->rate_code_val = $rate_type_value[1];
                     }
-                    $tech_offcl_imp->rate_percent=$tech_offcl_imp->getratecode($tech_offcl_imp->rate_code_type, $tech_offcl_imp->rate_code_val);
+                    $tech_offcl_imp->rate_percent = $tech_offcl_imp->getratecode($tech_offcl_imp->rate_code_type, $tech_offcl_imp->rate_code_val);
                     $tech_offcl_imp->save();
                     /* Tech Official Table Insert/Updated - Ended */
                 }
@@ -237,7 +242,8 @@ class TechController extends Controller {
         }
     }
 
-    public function actionCreate() {
+    public function actionCreate()
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $model = new User();
         $model->scenario = 'create';
@@ -267,10 +273,10 @@ class TechController extends Controller {
             if ($tech_offcl->load(Yii::$app->request->post())) {
                 if ($post['TechOfficial']['rate_code_type'] == 'In') {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
-                    $tech_offcl->rate_percent=$tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
+                    $tech_offcl->rate_percent = $tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
                 } else {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
-                    $tech_offcl->rate_percent=$tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
+                    $tech_offcl->rate_percent = $tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
                 }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))
@@ -292,22 +298,24 @@ class TechController extends Controller {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
-                        'model' => $model,
-                        'tech' => $tech,
-                        'tech_offcl' => $tech_offcl,
-                        'tech_vehicle' => $tech_vehicle,
+                'model' => $model,
+                'tech' => $tech,
+                'tech_offcl' => $tech_offcl,
+                'tech_vehicle' => $tech_vehicle,
             ]);
         }
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         $this->findModel($id)->delete();
         Billing::changeDeleteStatus($id);
         Yii::$app->getSession()->setFlash('success', 'Tech deleted successfully');
         return $this->redirect(['index']);
     }
 
-    public function actionUpdate($id) {
+    public function actionUpdate($id)
+    {
         $model = $this->findModel($id);
 
         $tech = TechProfile::find()->where(['user_id' => $id])->one();
@@ -344,10 +352,10 @@ class TechController extends Controller {
             if ($tech_offcl->load(Yii::$app->request->post())) {
                 if ($post['TechOfficial']['rate_code_type'] == 'In') {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['inhouse'];
-                    $tech_offcl->rate_percent=$tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
+                    $tech_offcl->rate_percent = $tech_offcl->getratecode("In", $tech_offcl->rate_code_val);
                 } else {
                     $tech_offcl->rate_code_val = $post['TechOfficial']['corporate'];
-                    $tech_offcl->rate_percent=$tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
+                    $tech_offcl->rate_percent = $tech_offcl->getratecode("Cp", $tech_offcl->rate_code_val);
                 }
                 $tech_offcl->user_id = $model->id;
                 if (!empty($post['TechOfficial']['hire_date']))
@@ -367,23 +375,33 @@ class TechController extends Controller {
             Yii::$app->getSession()->setFlash('success', 'Tech updated successfully');
             return $this->redirect(['index', 'id' => $model->id]);
         } else {
+
+            $searchModel = new TechDeductionsSearch();
+            $data = Yii::$app->request->queryParams;
+            $dataProvider = $searchModel->search($data);
+            $dataProvider->pagination->pageSize = 10;
+            $dataProvider->pagination->params = $data + ['tab' => 4];
+
             return $this->render('update', [
-                        'model' => $model,
-                        'tech' => $tech,
-                        'tech_offcl' => $tech_offcl,
-                        'tech_vehicle' => $tech_vehicle,
+                'model' => $model,
+                'tech' => $tech,
+                'tech_offcl' => $tech_offcl,
+                'tech_vehicle' => $tech_vehicle,
+                'dataProvider' => $dataProvider
             ]);
         }
     }
 
-    public function actionView($id) {
+    public function actionView($id)
+    {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+            'model' => $this->findModel($id),
         ]);
     }
 
-    public function actionDownload() {
+    public function actionDownload()
+    {
 
         $url = $_GET["url"];
 
@@ -392,27 +410,29 @@ class TechController extends Controller {
         Yii::$app->response->sendFile($path);
     }
 
-    protected function findModel($id) {
+    protected function findModel($id)
+    {
         if (($model = User::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-    
+
     /* Mocukp Pages */
     public function actionTechlist()
     {
-         return $this->render('/mockups/tech_list');
+        return $this->render('/mockups/tech_list');
     }
-    
+
     public function actionMyworks()
     {
-         return $this->render('/mockups/myworks');
+        return $this->render('/mockups/myworks');
     }
+
     public function actionSadmin()
     {
-         return $this->render('/mockups/sub_admin_list');
+        return $this->render('/mockups/sub_admin_list');
     }
 
 }

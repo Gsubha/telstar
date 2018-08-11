@@ -10,6 +10,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\widgets\ActiveForm;
+use yii\grid\GridView;
 
 /* @var $this View */
 /* @var $model User */
@@ -44,6 +45,9 @@ if ($model->isNewRecord)
                         <li class="active"><a href="#tab_1" data-toggle="tab"><b>Technical Information</b></a></li>
                         <li><a href="#tab_2" data-toggle="tab"><b>Vehicle Information</b></a></li>
                         <li><a href="#tab_3" data-toggle="tab"><b>Official Information</b></a></li>
+                        <?php if (!$model->isNewRecord) {?>
+                        <li><a href="#tab_4" data-toggle="tab"><b>Deductions</b></a></li>
+                        <?php } ?>
                     </ul>
                     <?php
                     $form = ActiveForm::begin(['id' => 'active-form',
@@ -65,10 +69,7 @@ if ($model->isNewRecord)
 
                         <div class="tab-pane active" id="tab_1">
                             <div class="box box-primary">
-
-
                                 <div class="box-body">
-
                                     <div class="form-group">
                                         <div class="col-md-6">
                                             <?= $form->field($model, 'techid')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord])->label('Tech ID*'); ?>
@@ -94,7 +95,6 @@ if ($model->isNewRecord)
 
                                     <div class="form-group">
                                         <div class="col-md-6">
-
                                             <?= $form->field($model, 'username')->textInput(['maxlength' => true])->label('User Name*') ?>
                                         </div>
                                         <div class="col-md-6">
@@ -168,7 +168,9 @@ if ($model->isNewRecord)
                                     </div>
 
                                 </div>
-
+                                <div class="box-footer">
+                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="tab_2">
@@ -214,7 +216,9 @@ if ($model->isNewRecord)
 
                                     </div>
                                 </div>
-
+                                <div class="box-footer">
+                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+                                </div>
                             </div>
                         </div>
                         <!-- /.tab-pane -->
@@ -285,14 +289,75 @@ if ($model->isNewRecord)
 
                                     </div>
                                 </div>
-
+                                <div class="box-footer">
+                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="box-footer">
-                            <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+                        <?php if (!$model->isNewRecord) {?>
+                        <div class="tab-pane" id="tab_4">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="box">
+                                        <div class="box-header">
+                                            <div class="pull-right">
+                                                <?= Html::a('Add Tech Deduction', ['techdeductions/create?tech_id='.$model->id], ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="box-body">
+                                            <?=
+                                            GridView::widget([
+                                                'dataProvider' => $dataProvider,
+//                        'filterModel' => $searchModel,
+                                                'columns' => [
+                                                    ['class' => 'yii\grid\SerialColumn'],
+                                                    'user.techid',
+                                                    [
+                                                        'label' => 'Category',
+                                                        'format' => 'raw',
+                                                        'value' => function ($model) {
+                                                            return \common\models\TechDeductions::$categories[$model->category];
+                                                        },
+                                                    ],
+                                                    'deduction_info',
+                                                    [
+                                                        'label' => 'Deduction date',
+                                                        'format' => 'raw',
+                                                        'value' => function ($model) {
+                                                            return date('m/d/Y', strtotime($model->deduction_date));
+                                                        },
+                                                    ],
+                                                    'qty',
+                                                    'total',
+                                                    'updated_at',
+                                                    ['class' => 'yii\grid\ActionColumn',
+                                                        'template' => '{update}&nbsp;&nbsp;{delete}',
+                                                        'buttons' => [
+                                                            'update' => function ($url, $model) {
+                                                                return Html::a('<i class="fa fa-fw fa-edit"></i>', ['techdeductions/update?id=' . $model->id], ['class' => 'bmodelButton', 'title' => 'Update']);
+                                                            },
+                                                            'delete' => function($url, $model) {
+                                                                return Html::a('<i class="fa fa-fw fa-trash"></i>', ['techdeductions/delete', 'id' => $model->id], [
+                                                                    'class' => '',
+                                                                    'data' => [
+                                                                        'confirm' => 'Are you sure you want to delete this tech deduction?',
+                                                                        'method' => 'post',
+                                                                    ],
+                                                                ]);
+//                            }
+                                                            },
+                                                        ],
+                                                    ],
+                                                ],
+                                            ]);
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
+                        <?php } ?>
                         <?php ActiveForm::end(); ?>
                     </div>
                 </div>
@@ -301,7 +366,7 @@ if ($model->isNewRecord)
     </section>
 <?php
 $other = Yii::$app->urlManager->createUrl('/admin/tech/getothers');
-
+$activetab = (@$_GET['tab']) ? : "";
 $script = <<< JS
 $(document).ready(function(){
     //Date picker
@@ -309,6 +374,11 @@ $(document).ready(function(){
 //         dateFormat: 'yy-mm-dd' ,
       autoclose: true
     });
+    
+    var activeTab = '{$activetab}';
+    if(activeTab){
+        $('a[href="#tab_'+ activeTab +'"]').tab('show');
+    }
         
         //For chossing vendor "Other" field
         

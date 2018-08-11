@@ -13,7 +13,7 @@ class AppAssetAdmin extends AssetBundle {
     public $baseUrl = '@web/themes/admin';
     public $css = [
         'css/blue.css',
-        'css/bootstrap.min.css',
+       // 'css/bootstrap.min.css',
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css',
         'https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css',
         'css/AdminLTE.min.css',
@@ -40,7 +40,7 @@ class AppAssetAdmin extends AssetBundle {
         'js/jquery.slimscroll.min.js',
         'js/fastclick.js',
         'js/adminlte.min.js',
-        'js/pages/dashboard.js',
+       // 'js/pages/dashboard.js',
         'js/demo.js',
         'plugins/datepicker/bootstrap-datepicker.js',
         'js/custom.js',

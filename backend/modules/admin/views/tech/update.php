@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = 'Update';
         'tech' => $tech,
         'tech_offcl' => $tech_offcl,
         'tech_vehicle' => $tech_vehicle,
+        'dataProvider' => $dataProvider
     ])
     ?>
 
