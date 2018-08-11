@@ -116,9 +116,8 @@ class TechdeductionsController extends Controller
         $post = Yii::$app->request->post();
         if ($model->isNewRecord) {
             $model->created_at = date('Y-m-d H:i:s');
-        }else {
-            $model->updated_at = date('Y-m-d H:i:s');
         }
+        $model->updated_at = date('Y-m-d H:i:s');
         $model->deduction_date = date('Y-m-d', strtotime($post['TechDeductions']['deduction_date']));
         $model->startdate = ($post['TechDeductions']['startdate']) ? date('Y-m-d', strtotime($post['TechDeductions']['startdate'])) : null;
         $model->enddate = ($post['TechDeductions']['enddate']) ? date('Y-m-d', strtotime($post['TechDeductions']['enddate'])) : null;
