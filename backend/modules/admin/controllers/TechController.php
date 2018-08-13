@@ -6,6 +6,7 @@ use common\models\Billing;
 use common\models\ImportFiles;
 use common\models\Location;
 use common\models\Tech;
+use common\models\TechDeductions;
 use common\models\TechDeductionsSearch;
 use common\models\TechOfficial;
 use common\models\TechProfile;
@@ -39,7 +40,7 @@ class TechController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download', 'techlist', 'myworks', 'sadmin'],
+                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getothers', 'import', 'download', 'techlist', 'myworks', 'sadmin', 'importtechdeduction'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -65,6 +66,106 @@ class TechController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionImporttechdeduction()
+    {
+        $model = new TechDeductions();
+        if ($model->load(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
+            $model->file = UploadedFile::getInstance($model, 'file');
+
+            if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
+                $date = date('Y-m-d H:i:s');
+                $time = time();
+                $file = $model->file->name;
+                $folder = Yii::$app->basePath . '/web/uploads/techdeductions/';
+                $model->file->saveAs($folder . $time . '_' . $file);
+                //return $this->redirect(['index']);
+                try {
+                    $filename = $folder . $time . '_' . $file;
+                    /* Save Uploaded File Details - Start */
+                    $import_files_model = new ImportFiles();
+                    $import_files_model->cat = "Tech";
+                    $import_files_model->type = "Deductions";
+                    $import_files_model->name = $time . '_' . $file;
+                    $import_files_model->path = 'web/uploads/techdeductions';
+                    $import_files_model->created_at = $time;
+                    $import_files_model->created_by = Yii::$app->user->id;
+                    $import_files_model->save();
+                    /* Save Uploaded File Details - End */
+
+                    $inputFileType = PHPExcel_IOFactory::identify($filename);
+                    $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+                    $objReader->setReadDataOnly(true);
+                    $objPHPExcel = $objReader->load($filename);
+                } catch (Exception $e) {
+                    die('Error');
+                }
+
+                $sheet = $objPHPExcel->getSheet(0);
+                $this->findImporttechdeductions($sheet);
+                return $this->redirect(['index']);
+            } else {
+                \Yii::$app->session->setFlash('error', 'Only files with these extensions are allowed: xls, xlsx');
+            }
+        }
+
+        return $this->render('importtechdeduction', [
+            'model' => $model,
+        ]);
+    }
+
+    public function findImporttechdeductions($sheet)
+    {
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        if ($highestColumn == 'I') {
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+                if ($row == 1) {
+                    continue;
+                }
+                // trim the values
+                foreach ($rowData[0] as $key => $val) {
+                    $rowData[0][$key] = trim($rowData[0][$key]);
+                }
+
+
+//                [0] => 70034
+//                [1] => On-going deduction
+//                [2] => Truck
+//                [3] => 05/15/2018
+//                [4] =>
+//                [5] =>
+//                [6] => 4
+//                [7] => 150
+//                [8] =>
+
+                $techid = $rowData[0][0];
+                $umodel = User::find()
+                    ->where(['techid' => $techid])
+                    ->one();
+                if (!empty($umodel)) {
+                    $uid = $umodel->id;
+                }else {
+                    continue;
+                }
+                $model = new TechDeductions();
+                $model->user_id = $uid;
+                if ($rowData[0][1] && in_array($rowData[0][1] ,TechDeductions::$categories )) {
+                    $model->category = TechDeductions::$categories[$rowData[0][1]];
+                }
+                $model->deduction_info = $rowData[0][2];
+                $model->deduction_date = $rowData[0][3];
+                $model->deduction_startdate = $rowData[0][4];
+                $model->deduction_enddate = $rowData[0][5];
+                $model->qty = $rowData[0][6];
+                $model->total = $rowData[0][7];
+                $model->description = $rowData[0][8];
+                $model->save();
+            }
+        }
     }
 
     public function actionImport()
