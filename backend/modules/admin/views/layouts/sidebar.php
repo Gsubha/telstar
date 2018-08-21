@@ -47,7 +47,8 @@ use yii\widgets\Menu;
                     'url' => ['#'],                    
                     'options' => ['class' => 'treeview'],                   
                     'items' => [
-                        ['label' => '<i class="fa fa-angle-double-right"></i> <span>Tech Overview</span>', 'url' => ['billing/tech-overview']],                        
+                        ['label' => '<i class="fa fa-angle-double-right"></i> <span>Tech Overview</span>', 'url' => ['billing/tech-overview']],   
+                        ['label' => '<i class="fa fa-angle-double-right"></i> <span>Tech Deduction Report</span>', 'url' => ['reports/techdeductions']],  
                     ]
                 ],
                 ['label' => '<i class="fa fa-upload"></i> <span>Upload Management</span>', 'url' => ['import-files/index']],

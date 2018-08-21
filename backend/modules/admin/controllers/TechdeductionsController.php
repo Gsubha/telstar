@@ -3,12 +3,13 @@
 namespace backend\modules\admin\controllers;
 
 use common\models\Deductions;
-use Yii;
 use common\models\TechDeductions;
 use common\models\TechDeductionsSearch;
+use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * TechdeductionsController implements the CRUD actions for TechDeductions model.
@@ -20,7 +21,22 @@ class TechdeductionsController extends Controller
      */
     public function behaviors()
     {
+
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => [''],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['index', 'create', 'update', 'view', 'delete', 'getprice'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

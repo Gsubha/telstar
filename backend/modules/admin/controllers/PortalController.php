@@ -94,8 +94,8 @@ class PortalController extends Controller
 
         if ($model->load(Yii::$app->request->post())  && $model->validate()) {
              $post = Yii::$app->request->post();
-            $model->created_at =  date('Y-m-d H:i:s');
-            $model->created_by = Yii::$app->user->id;
+            $model->updated_at =  date('Y-m-d H:i:s');
+            $model->updated_by = Yii::$app->user->id;
             $model->save();
             Yii::$app->getSession()->setFlash('success', 'Portal updated successfully');
             return $this->redirect(['index', 'id' => $model->id]);

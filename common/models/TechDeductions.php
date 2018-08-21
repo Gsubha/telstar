@@ -24,7 +24,7 @@ use Yii;
  */
 class TechDeductions extends \yii\db\ActiveRecord
 {
-
+    public $file,$techid;
     public static $categories = [ "ongoing" => "On-going deduction", "onetime" => "One time deduction", "periodic" => "Periodic deduction"];
     /**
      * {@inheritdoc}
@@ -91,5 +91,14 @@ class TechDeductions extends \yii\db\ActiveRecord
     public static function checkDate($date)
     {
         return date('Y-m-d', strtotime($date));
+    }
+    public function getTechIds()
+    {
+       $q=TechDeductions::find()->joinWith(['user'])->select(['tech_deductions.user_id','user.techid'])->groupBy("tech_deductions.user_id")->all();
+       if($q){
+           return $q;
+       }else {
+        return array();
+       }
     }
 }

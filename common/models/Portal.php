@@ -56,4 +56,15 @@ class Portal extends \yii\db\ActiveRecord
             'deleted_at' => 'Deleted At',
         ];
     }
+    
+    public function beforeSave($insert) {
+        if ($this->isNewRecord) {
+            $this->created_at = date("Y-m-d H:i:s");
+            $this->created_by = Yii::$app->user->id;
+        } else {
+            $this->updated_at = date("Y-m-d H:i:s");
+            $this->updated_by =Yii::$app->user->id;
+        }
+        return parent::beforeSave($insert);
+    }
 }

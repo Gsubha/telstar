@@ -5,6 +5,7 @@ namespace backend\modules\admin\controllers;
 use common\models\Billing;
 use common\models\ImportFiles;
 use common\models\ImportFilesSearch;
+use common\models\TechDeductions;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -14,8 +15,8 @@ use yii\web\NotFoundHttpException;
 /**
  * ImportFilesController implements the CRUD actions for ImportFiles model.
  */
-class ImportFilesController extends Controller
-{
+class ImportFilesController extends Controller {
+
     /**
      * {@inheritdoc}
      */
@@ -48,15 +49,14 @@ class ImportFilesController extends Controller
      * Lists all ImportFiles models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex() {
         $searchModel = new ImportFilesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $pagesize = 50;
         $dataProvider->pagination->pageSize = $pagesize;
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -66,12 +66,11 @@ class ImportFilesController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
+    public function actionView($id) {
         return $this->redirect(['index']);
-        /*return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);*/
+        /* return $this->render('view', [
+          'model' => $this->findModel($id),
+          ]); */
     }
 
     /**
@@ -79,18 +78,17 @@ class ImportFilesController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
-    {
+    public function actionCreate() {
         return $this->redirect(['index']);
-        /*$model = new ImportFiles();
+        /* $model = new ImportFiles();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+          if ($model->load(Yii::$app->request->post()) && $model->save()) {
+          return $this->redirect(['view', 'id' => $model->id]);
+          }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);*/
+          return $this->render('create', [
+          'model' => $model,
+          ]); */
     }
 
     /**
@@ -100,18 +98,17 @@ class ImportFilesController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         return $this->redirect(['index']);
-        /*$model = $this->findModel($id);
+        /* $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+          if ($model->load(Yii::$app->request->post()) && $model->save()) {
+          return $this->redirect(['view', 'id' => $model->id]);
+          }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);*/
+          return $this->render('update', [
+          'model' => $model,
+          ]); */
     }
 
     /**
@@ -121,15 +118,23 @@ class ImportFilesController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id,$path='')
-    {
-        
-        if($this->findModel($id)->delete())
-        {
-            Billing::deleteAll(['upload_id'=>$id]);
+    public function actionDelete($id, $path = '', $cat = '') {
+
+        if ($this->findModel($id)->delete()) {
+            switch ($cat) {
+                case "Tech_Deduction":
+                    TechDeductions::deleteAll(['upload_id' => $id]);
+                    break;
+
+                case "Tech":
+                case "Billing":
+                    Billing::deleteAll(['upload_id' => $id]);
+                    break;
+            }
+
             $filepath = Yii::$app->basePath . "/$path";
             if (is_file($filepath)) {
-               unlink($filepath);
+                unlink($filepath);
             }
         }
         return $this->redirect(['index']);
@@ -142,26 +147,26 @@ class ImportFilesController extends Controller
      * @return ImportFiles the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = ImportFiles::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    
+
     public function actionDownload() {
 
         $url = $_GET["url"];
 
         $path = Yii::$app->basePath . "/$url";
-        
+
         if (is_file($path)) {
-           Yii::$app->response->sendFile($path);
+            Yii::$app->response->sendFile($path);
         } else {
             Yii::$app->session->setFlash('error', 'File is not Exists');
-           return $this->redirect(['index']);
+            return $this->redirect(['index']);
         }
     }
+
 }

@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         );
                                     },
                                     'delete' => function($url, $model) {
-                                        return Html::a('<i class="fa fa-fw fa-trash"></i>', ['import-files/delete', 'id' => $model->id,'path'=>$model->path."/".$model->name], [
+                                        return Html::a('<i class="fa fa-fw fa-trash"></i>', ['import-files/delete', 'id' => $model->id,'path'=>$model->path."/".$model->name,'cat'=>$model->cat], [
                                                     'class' => 'hidden-print',
                                                     'data' => [
                                                         'confirm' => 'Are you sure you want to delete this data?',

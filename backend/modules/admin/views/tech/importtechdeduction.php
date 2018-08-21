@@ -45,13 +45,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excelsheet ( Deduction Date , Deduction Start Date, Deduction End Date)  </li>
                                 <li> Please fill the <strong>Category</strong> column using following values,
                                     <br/>
-                                    For ongoing deductions use value <strong>"On-going deduction"</strong>.
+                                    For ongoing deductions use value <strong>"ongoing"</strong>.
                                     <br/>
-                                    For one time deductions use value <strong>"One time deduction"</strong>.
+                                    For one time deductions use value <strong>"onetime"</strong>.
                                     <br/>
-                                    For periodic deductions use value <strong>"Periodic deduction"</strong>.
+                                    For periodic deductions use value <strong>"periodic"</strong>.
                                 </li>
-                                <!--(III) Please fill the START_TIME and END_TIME using this syntax. Example: 11:00 am (Need space between time and the meridians)Choose your respective affiliate and instructor code.<br>-->
+                                <li><i> <strong>Note: </strong>Start Date and End Date Required for periodic category </i></li>
+                                
                             </ul>
                             </p>
 

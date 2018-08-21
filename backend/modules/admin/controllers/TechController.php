@@ -26,11 +26,9 @@ use yii\web\UploadedFile;
 //use yii\web\User;
 //use yii\web\User;
 
-class TechController extends Controller
-{
+class TechController extends Controller {
 
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             'access' => [
                 'class' => AccessControl::className(),
@@ -55,21 +53,19 @@ class TechController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex() {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $searchModel = new TechSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $pagesize = (isset($_GET['pagesize'])) ? $_GET['pagesize'] : 50;
         $dataProvider->pagination->pageSize = $pagesize;
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
         ]);
     }
 
-    public function actionImporttechdeduction()
-    {
+    public function actionImporttechdeduction() {
         $model = new TechDeductions();
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -80,19 +76,21 @@ class TechController extends Controller
                 $time = time();
                 $file = $model->file->name;
                 $folder = Yii::$app->basePath . '/web/uploads/techdeductions/';
+                $upld_id = NULL;
                 $model->file->saveAs($folder . $time . '_' . $file);
                 //return $this->redirect(['index']);
                 try {
                     $filename = $folder . $time . '_' . $file;
                     /* Save Uploaded File Details - Start */
                     $import_files_model = new ImportFiles();
-                    $import_files_model->cat = "Tech";
+                    $import_files_model->cat = "Tech_Deduction";
                     $import_files_model->type = "Deductions";
                     $import_files_model->name = $time . '_' . $file;
                     $import_files_model->path = 'web/uploads/techdeductions';
                     $import_files_model->created_at = $time;
                     $import_files_model->created_by = Yii::$app->user->id;
-                    $import_files_model->save();
+                    if ($import_files_model->save())
+                        $upld_id = Yii::$app->db->getLastInsertID();
                     /* Save Uploaded File Details - End */
 
                     $inputFileType = PHPExcel_IOFactory::identify($filename);
@@ -104,7 +102,7 @@ class TechController extends Controller
                 }
 
                 $sheet = $objPHPExcel->getSheet(0);
-                $this->findImporttechdeductions($sheet);
+                $this->findImporttechdeductions($sheet,$upld_id);
                 return $this->redirect(['index']);
             } else {
                 \Yii::$app->session->setFlash('error', 'Only files with these extensions are allowed: xls, xlsx');
@@ -112,12 +110,11 @@ class TechController extends Controller
         }
 
         return $this->render('importtechdeduction', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    public function findImporttechdeductions($sheet)
-    {
+    public function findImporttechdeductions($sheet, $upld_id = NULL) {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
         if ($highestColumn == 'I') {
@@ -143,33 +140,53 @@ class TechController extends Controller
 //                [8] =>
 
                 $techid = $rowData[0][0];
+                if($techid==''){
+                    continue;
+                }
                 $umodel = User::find()
-                    ->where(['techid' => $techid])
-                    ->one();
+                        ->where(['techid' => $techid])
+                        ->one();
                 if (!empty($umodel)) {
                     $uid = $umodel->id;
-                }else {
+                } else {
                     continue;
                 }
                 $model = new TechDeductions();
                 $model->user_id = $uid;
-                if ($rowData[0][1] && in_array($rowData[0][1] ,TechDeductions::$categories )) {
-                    $model->category = TechDeductions::$categories[$rowData[0][1]];
+                if ($rowData[0][1] && array_key_exists($rowData[0][1], TechDeductions::$categories)) {
+                    $model->category = $rowData[0][1];//TechDeductions::$categories[$rowData[0][1]];
+                } else {
+                    continue;
+                }
+                if ($model->category == "periodic" && ($rowData[0][4] == '' || $rowData[0][5] == '')) {
+                    continue;
                 }
                 $model->deduction_info = $rowData[0][2];
-                $model->deduction_date = $rowData[0][3];
-                $model->deduction_startdate = $rowData[0][4];
-                $model->deduction_enddate = $rowData[0][5];
+                $model->deduction_date = date("Y-m-d", strtotime($rowData[0][3]));
+                if ($model->category == "periodic") {
+                    $model->startdate = date("Y-m-d", strtotime($rowData[0][4]));
+                    $model->enddate = date("Y-m-d", strtotime($rowData[0][5]));
+                }
+                if ($model->category != "onetime"){
                 $model->qty = $rowData[0][6];
+                }
+                
                 $model->total = $rowData[0][7];
                 $model->description = $rowData[0][8];
-                $model->save();
+                $model->upload_id = $upld_id;
+                if ($model->save())
+                {
+                     \Yii::$app->session->setFlash('success', 'Tech Deduction Imported Successfully');
+                }
+                else {
+                     \Yii::$app->session->setFlash('error', 'Failed to Import Tech Deduction. Please try again');
+                }
+                
             }
         }
     }
 
-    public function actionImport()
-    {
+    public function actionImport() {
         $model = new Tech();
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -212,12 +229,11 @@ class TechController extends Controller
         }
 
         return $this->render('import', [
-            'model' => $model,
+                    'model' => $model,
         ]);
     }
 
-    public function findImport($sheet)
-    {
+    public function findImport($sheet) {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
         if ($highestColumn == 'AB') {
@@ -232,8 +248,8 @@ class TechController extends Controller
                 }
                 $techid = $rowData[0][21];
                 $umodel = User::find()
-                    ->where(['techid' => $techid])
-                    ->one();
+                        ->where(['techid' => $techid])
+                        ->one();
                 if (!empty($umodel))
                     $uid = $umodel->id;
                 else
@@ -343,8 +359,7 @@ class TechController extends Controller
         }
     }
 
-    public function actionCreate()
-    {
+    public function actionCreate() {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         $model = new User();
         $model->scenario = 'create';
@@ -399,24 +414,22 @@ class TechController extends Controller
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
-                'model' => $model,
-                'tech' => $tech,
-                'tech_offcl' => $tech_offcl,
-                'tech_vehicle' => $tech_vehicle,
+                        'model' => $model,
+                        'tech' => $tech,
+                        'tech_offcl' => $tech_offcl,
+                        'tech_vehicle' => $tech_vehicle,
             ]);
         }
     }
 
-    public function actionDelete($id)
-    {
+    public function actionDelete($id) {
         $this->findModel($id)->delete();
         Billing::changeDeleteStatus($id);
         Yii::$app->getSession()->setFlash('success', 'Tech deleted successfully');
         return $this->redirect(['index']);
     }
 
-    public function actionUpdate($id)
-    {
+    public function actionUpdate($id) {
         $model = $this->findModel($id);
 
         $tech = TechProfile::find()->where(['user_id' => $id])->one();
@@ -484,25 +497,23 @@ class TechController extends Controller
             $dataProvider->pagination->params = $data + ['tab' => 4];
 
             return $this->render('update', [
-                'model' => $model,
-                'tech' => $tech,
-                'tech_offcl' => $tech_offcl,
-                'tech_vehicle' => $tech_vehicle,
-                'dataProvider' => $dataProvider
+                        'model' => $model,
+                        'tech' => $tech,
+                        'tech_offcl' => $tech_offcl,
+                        'tech_vehicle' => $tech_vehicle,
+                        'dataProvider' => $dataProvider
             ]);
         }
     }
 
-    public function actionView($id)
-    {
+    public function actionView($id) {
 //        $this->layout = "@app/modules/admin/views/layouts/main";
         return $this->render('view', [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
-    public function actionDownload()
-    {
+    public function actionDownload() {
 
         $url = $_GET["url"];
 
@@ -511,8 +522,7 @@ class TechController extends Controller
         Yii::$app->response->sendFile($path);
     }
 
-    protected function findModel($id)
-    {
+    protected function findModel($id) {
         if (($model = User::findOne($id)) !== null) {
             return $model;
         } else {
@@ -521,18 +531,16 @@ class TechController extends Controller
     }
 
     /* Mocukp Pages */
-    public function actionTechlist()
-    {
+
+    public function actionTechlist() {
         return $this->render('/mockups/tech_list');
     }
 
-    public function actionMyworks()
-    {
+    public function actionMyworks() {
         return $this->render('/mockups/myworks');
     }
 
-    public function actionSadmin()
-    {
+    public function actionSadmin() {
         return $this->render('/mockups/sub_admin_list');
     }
 
