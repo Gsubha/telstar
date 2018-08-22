@@ -78,4 +78,9 @@ class TechProfile extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Vendor::className(), ['id' => 'vendor_id']);
     }
+    
+    public function getLocation()
+    {
+        return $this->hasOne(Location::className(), ['id' => 'location_id']);
+    }
 }

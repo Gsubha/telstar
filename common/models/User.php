@@ -250,4 +250,12 @@ class User extends ActiveRecord implements IdentityInterface {
         return $v->username;
         
     }
+    
+     public function getVendorInfo() {
+        return $this->hasOne(Vendor::className(), ['id' => 'vendor_id'])->via('profileUser');
+    }
+    
+    public function getLocationInfo() {
+        return $this->hasOne(Location::className(), ['id' => 'location_id'])->via('profileUser');
+    }
 }
