@@ -22,37 +22,50 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <?php
                     $form = ActiveForm::begin(['id' => 'active-form',
-                            'options' => [
-                                'class' => 'form-horizontal',
-                                'enctype' => 'multipart/form-data',
-                            ],
-                            'fieldConfig' => [
-                                'template' => "{label}<div class=\"col-sm-5\">{input}<b style='color: #000;'>{hint}</b><div class=\"errorMessage\">{error}</div></div>",
-                                'labelOptions' => ['class' => 'col-sm-2 control-label'],
-                            ],
-                        ]
+                                'options' => [
+                                    'class' => 'form-horizontal',
+                                    'enctype' => 'multipart/form-data',
+                                ],
+                                'fieldConfig' => [
+                                    'template' => "{label}<div class=\"col-sm-5\">{input}<b style='color: #000;'>{hint}</b><div class=\"errorMessage\">{error}</div></div>",
+                                    'labelOptions' => ['class' => 'col-sm-2 control-label'],
+                                ],
+                                    ]
                     );
                     ?>
                     <div class="box-body">
                         <div class="form-group">
+                            <?= $form->field($model, 'category')->dropDownList(["ongoing" => "On-going deduction","onetime" => "One time deduction"], ['class' => 'form-control','prompt' => 'Select Import Type']) ?>
+                        </div>
+                        <div class="form-group">
                             <?= $form->field($model, 'file')->fileInput() ?>
 
                             <p>
-                            <div style="padding:10px;"><h3 style="color:RED">Hints:</h3></div>
+                            <div style="padding:10px;"><h3 style="color:red">Hints:</h3></div>
                             <ul>
-                                <li> Please use the given excelsheet format ( Example:<a href="download?url=web/uploads/sample/tech_deduction1.xlsx"> Tech Deduction Informations</a> )</li>
-                                <li> Please fill the list of mandatory fields for each schedule. (Tech ID, Category, Amount)</li>
-                                <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excelsheet ( Deduction Date , Deduction Start Date, Deduction End Date)  </li>
+                                <li> Please use the given excel-sheet format ( Example:<a href="download?url=web/uploads/sample/Onetime.xls"> One Time Deduction</a> , <a href="download?url=web/uploads/sample/Ongoing.xls"> On Going Deduction</a> )</li>
+                                <li> Please fill the list of mandatory fields for each schedule. (Tech ID, Category, Deduction Type, Amount, Deduction Date)</li>
+                                <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excel-sheet ( Deduction Date )  </li>
                                 <li> Please fill the <strong>Category</strong> column using following values,
                                     <br/>
-                                    For ongoing deductions use value <strong>"ongoing"</strong>.
+                                    - For OnGoing deductions use value <strong>ongoing</strong>.
                                     <br/>
-                                    For one time deductions use value <strong>"onetime"</strong>.
-                                    <br/>
-                                    For periodic deductions use value <strong>"periodic"</strong>.
+                                    - For OneTime deductions use value <strong>onetime</strong>.
+<!--                                    <br/>
+                                    For periodic deductions use value <strong>"periodic"</strong>.-->
                                 </li>
-                                <li><i> <strong>Note: </strong>Start Date and End Date Required for periodic category </i></li>
-                                
+                                <li> Please fill the <strong>Deduction Type</strong> column using following values,
+                                   <br/>
+                                    - For Meter Lease, use value <strong>Meter</strong>. (Required: Serial Number).
+                                    <br/>
+                                    - For Van Lease, use value <strong>Truck</strong>. (Required: Yes/No, Vin#).
+                                    <br/>
+                                    - For WC/GL, use value <strong>WC/GL</strong>. (Required: Yes/No, Percentage).
+                                    <br>
+                                    - For <b>Percentage</b>, use any one value from <b>5,8,10,12,15</b>.
+                                </li>
+                                <!--<li><i> <strong>Note: </strong>Start Date and End Date Required for periodic category </i></li>-->
+
                             </ul>
                             </p>
 

@@ -16,23 +16,23 @@ use yii\widgets\ActiveForm;
             <div class="box box-primary">
                 <?php
                 $form = ActiveForm::begin(['id' => 'active-form',
-                        'options' => [
-                            'class' => 'form-horizontal',
-                        ],
-                        'fieldConfig' => [
-                            'template' => "{label}<div class=\"col-sm-8\">{input}<b style='color: #000;'>{hint}</b><div class=\"errorMessage\">{error}</div></div>",
-                            'labelOptions' => ['class' => 'col-sm-3 control-label'],
-                        ],
-                        'enableAjaxValidation' => false,
-                        'enableClientValidation' => true,
-                    ]
+                            'options' => [
+                                'class' => 'form-horizontal',
+                                'enctype' => 'multipart/form-data',
+                            ],
+                            'fieldConfig' => [
+                                'template' => "{label}<div class=\"col-sm-8\">{input}<b style='color: #000;'>{hint}</b><div class=\"errorMessage\">{error}</div></div>",
+                                'labelOptions' => ['class' => 'col-sm-3 control-label'],
+                            ],
+                            'enableClientValidation' => true,
+                                ]
                 );
                 ?>
                 <div class="box-body">
                     <div class="form-group" style="display: none;">
                         <div class="col-md-8">
                             <?php
-                            if(isset($_GET['tech_id'])){
+                            if (isset($_GET['tech_id'])) {
                                 $model->user_id = $_GET['tech_id'];
                             }
                             ?>
@@ -44,59 +44,174 @@ use yii\widgets\ActiveForm;
                             <?= $form->field($model, 'category')->dropDownList(\common\models\TechDeductions::$categories, ['class' => 'form-control', 'prompt' => '--- Select Category ---'])->label('Category*'); ?>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-md-8">
-                            <?= $form->field($model, 'deduction_info')->textInput()->label('Deduction Info'); ?>
-                        </div>
-                    </div>
-                    <div class="form-group">
+                    <div class="form-group ongoing_divs hideshow" id='ongoing_type_div'>
                         <div class="col-md-8">
                             <?php
-                            if(@$model->deduction_date) {
-                                $model->deduction_date = date('m/d/Y', strtotime($model->deduction_date));
+                            if (@$model->deduction_info) {
+                                $model->deduction_info = $model->deduction_info;
+                            } else {
+                                $model->deduction_info = "";
                             }
                             ?>
-                            <?= $form->field($model, 'deduction_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Deducation Date*'); ?>
+                            <?= $form->field($model, 'deduction_info')->dropDownList(\common\models\TechDeductions::$ongoing_categories, ['class' => 'form-control', 'prompt' => '--- Select Type ---'])->label('Deduction Type*'); ?>
                         </div>
                     </div>
-                    <div id="periodic_dates" style="display: none;">
+                    <div class="meter_lease hideshow ongoing_divs">
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?php
-                                if(@$model->startdate) {
-                                    $model->startdate = date('m/d/Y', strtotime($model->startdate));
-                                }
-                                ?>
-                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Start Date*'); ?>
+                                <?= $form->field($model, 'serial_num')->textInput()->label('Serial Number*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
                                 <?php
-                                if(@$model->enddate) {
-                                    $model->enddate = date('m/d/Y', strtotime($model->enddate));
+                                if (@$model->deduction_date) {
+                                    $model->issue_date = date('m/d/Y', strtotime($model->deduction_date));
+                                } else {
+                                    $model->issue_date = date('m/d/Y');
                                 }
                                 ?>
-                                <?= $form->field($model, 'enddate')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> End Date*'); ?>
+                                <?= $form->field($model, 'issue_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Issue Date*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'total')->textInput(['maxlength' => true])->label('Amount*'); ?>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group dqty" style="display: none;">
-                        <div class="col-md-8">
-                            <?= $form->field($model, 'qty')->textInput(['maxlength' => true])->label('Qty'); ?>
+                    <div class="van_lease hideshow ongoing_divs">
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'van_yes')->checkbox(['label' => ''])->label('Yes'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'vin')->textInput()->label('Vin#*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?php
+                                if (@$model->deduction_date) {
+                                    $model->van_deduction_date = date('m/d/Y', strtotime($model->deduction_date));
+                                } else {
+                                    $model->van_deduction_date = date('m/d/Y');
+                                }
+                                ?>
+                                <?= $form->field($model, 'van_deduction_date')->textInput(['class' => 'form-control datepicker', 'id' => 'van_deduction_date'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Date*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'van_amount')->textInput(['maxlength' => true, 'id' => 'van_amount'])->label('Amount*'); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wcgl_lease hideshow ongoing_divs">
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'wcgl_yes')->checkbox(['label' => ''])->label('Yes'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'percentage')->dropDownList(\common\models\TechDeductions::$wcgl_percentages, ['class' => 'form-control', 'prompt' => '--- Select Percentage ---'])->label('Percentage*'); ?>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="col-md-8">
-                            <?= $form->field($model, 'total')->textInput(['maxlength' => true])->label('Amount*'); ?>
+                    <?php /* One time deduction form - Start */ ?>
+                    <div class="onetime hideshow">
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?php
+                                if (@$model->deduction_info) {
+                                    $model->onetime_deduction_type = $model->deduction_info;
+                                } else {
+                                    $model->onetime_deduction_type = "";
+                                }
+                                ?>
+                                <?= $form->field($model, 'onetime_deduction_type')->textInput(['id=>onetime_deduction_type'])->label('Deduction Type*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?php
+                                if (@$model->deduction_date) {
+                                    $model->deduction_date = date('m/d/Y', strtotime($model->deduction_date));
+                                } else {
+                                    $model->deduction_date = date('m/d/Y');
+                                }
+                                ?>
+                                <?= $form->field($model, 'deduction_date')->textInput(['class' => 'form-control datepicker', 'id' => 'onetime_deduction_date'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Deduction Date*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'work_order')->textInput()->label('Work Order*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?php
+                                if (@$model->total) {
+                                    $model->onetime_amt = $model->total;
+                                } else {
+                                    $model->onetime_amt = "";
+                                }
+                                ?>
+                                <?= $form->field($model, 'onetime_amt')->textInput(['maxlength' => true, 'id' => 'onetime_amount'])->label('Amount*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'description')->textarea(['id' => 'onetime_comment'])->label('Comment*'); ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <?php /* One time deduction form - End */ ?>
+                    <?php /* Installment Deduction form - Start  */ ?>
+                    <div class="form-group installment hideshow">
                         <div class="col-md-8">
-                            <?= $form->field($model, 'description')->textarea()->label('Comments') ?>
+                            <?php
+                            if (@$model->deduction_info) {
+                                $model->installment_type = $model->deduction_info;
+                            } else {
+                                $model->installment_type = "";
+                            }
+                            ?>
+                            <?= $form->field($model, 'installment_type')->dropDownList(\common\models\TechDeductions::$installment_categories, ['class' => 'form-control', 'prompt' => '--- Select Type ---'])->label('Installment Type*'); ?>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'installment_amount')->textInput(['maxlength' => true, 'id' => 'installment_amount'])->label('Amount*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'num_installment')->textInput(['maxlength' => true])->label('Number of Installments*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'installment_comment')->textarea()->label('Comment*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control datepicker', 'id' => 'startweek_date'])->label('<i class="fa fa-calendar"></i> Start Week Date*'); ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                <?= $form->field($model, 'enddate')->textInput(['class' => 'form-control datepicker', 'id' => 'endweek_date'])->label('<i class="fa fa-calendar"></i> End Week Date*'); ?>
+                            </div>
                         </div>
                     </div>
+                    <?php /* Installment Deduction form - End */ ?>
+
                     <div class="box-footer">
                         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
                     </div>
@@ -107,75 +222,79 @@ use yii\widgets\ActiveForm;
     </div>
 </section>
 <?php
-$callback = Yii::$app->urlManager->createUrl(['admin/techdeductions/getprice']);
+$callback = Yii::$app->urlManager->createUrl(['admin/techdeductions/get_ongoing_types']);
 $script = <<< JS
 $(document).ready(function(){
+    $(".hideshow").hide();
     var category = '{$model->category}';
-    showFields(category);      
-      
-    //Date picker
+    showFields(category);
+    
     $('.datepicker').datepicker({
-//         dateFormat: 'yy-mm-dd' ,
+      //dateFormat: 'yy-mm-dd' ,
       autoclose: true
-    });          
+    });
     
     $("#techdeductions-category").on("change", function(){
+        $(".hideshow").hide();
         var Category = $("#techdeductions-category").val();
         showFields(Category);
     });
     
-    function showFields(Category){       
-        if(Category == "ongoing"){
-            $(".dqty").show();
-            $("#periodic_dates").hide();
-        }else if(Category == "onetime"){
-            $(".dqty").hide();    
-            $(".periodic_dates").hide();
-        }else if(Category == "periodic"){
-            $(".dqty").show();
-            $("#periodic_dates").show();
+    $("#techdeductions-deduction_info").on("change",function(){
+        $(".hideshow").hide();
+        var ongoingType=$('#techdeductions-deduction_info').val();
+        showOngoingType(ongoingType);
+    });
+    
+    
+    
+    function showFields(Category){ 
+        switch(Category)
+        {
+            case "ongoing":
+                var deduction_type = '{$model->deduction_info}';
+                $('#techdeductions-deduction_info').prop('selectedIndex',0);
+                if(deduction_type!=''){
+                    $("#techdeductions-deduction_info").val(deduction_type);
+                    showOngoingType(deduction_type);
+                }
+                $("#ongoing_type_div").show();
+            break;
+            
+            case "onetime":
+                $(".onetime").show();
+            break;
+                
+            case "installment":
+                $(".installment").show();
+            break;
+    
+            default:
+                $(".hideshow").hide();
+            break;
         }
     }
     
-//    $("#techdeductions-deduction_id").on("change", function(){
-//        var qty = $("#techdeductions-qty").val();   
-//        var deduction_id = $(this).val();       
-//        if(deduction_id > 0){
-//            $.ajax({
-//                method: 'POST',
-//                url: '{$callback}',
-//                data: 'deduction_id='+$(this).val(),
-//                success: function (price) {                                
-//                    $("#priceperunit").show();
-//                    $("#unitprice").html(price);
-//                    $("#unitpricehidden").val(price);
-//                    calcualatetotal(qty,price); 
-//                }
-//            });
-//        }else{
-//             $("#priceperunit").hide();
-//             $("#unitprice").html("0.00");
-//             $("#unitpricehidden").val("0.00");
-//             $("#techdeductions-total").val( "0.00" );
-//        }     
-//    });
-//    
-//    $("#techdeductions-qty").on("keyup", function(){
-//        var qty = $(this).val();   
-//        var unitprice = $("#unitpricehidden").val();   
-//        calcualatetotal(qty,unitprice);
-//        return false;
-//    });
-}); 
-
-// function calcualatetotal(qty,unitprice){    
-//     if(qty && unitprice){
-//         var total = parseFloat(qty) * parseFloat(unitprice);
-//         $("#techdeductions-total").val( parseFloat(total));     
-//     }else{
-//         $("#techdeductions-total").val( "0.00" );
-//     }
-// }
+    function showOngoingType(ongoingType)
+    {
+        $("#ongoing_type_div").show();
+        switch(ongoingType)
+        {
+            case "Meter":
+            $(".meter_lease").show();
+            break;
+    
+            case "Truck":
+            $(".van_lease").show();
+            break;
+    
+            case "WC/GL":
+            $(".wcgl_lease").show();
+            break;
+        }
+    }
+    
+});
 JS;
 $this->registerJs($script, \yii\web\View::POS_END);
 ?>

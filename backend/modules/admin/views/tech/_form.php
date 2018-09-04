@@ -325,7 +325,11 @@ if ($model->isNewRecord)
                                                         'label' => 'Deduction date',
                                                         'format' => 'raw',
                                                         'value' => function ($model) {
+                                                            if($model->deduction_date){
                                                             return date('m/d/Y', strtotime($model->deduction_date));
+                                                            }else{
+                                                                return "-";
+                                                            }
                                                         },
                                                     ],
                                                     'qty',

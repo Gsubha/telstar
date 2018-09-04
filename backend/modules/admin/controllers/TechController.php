@@ -66,11 +66,11 @@ class TechController extends Controller {
     }
 
     public function actionImporttechdeduction() {
-        $model = new TechDeductions();
+        $model = new TechDeductions(['scenario' => 'import']);
         if ($model->load(Yii::$app->request->post())) {
-            $post = Yii::$app->request->post();
+            //$post = Yii::$app->request->post();
             $model->file = UploadedFile::getInstance($model, 'file');
-
+            $ImportType = $model->category;
             if (isset($model->file) && ($model->file->extension == 'xlsx' || $model->file->extension == 'xls')) {
                 $date = date('Y-m-d H:i:s');
                 $time = time();
@@ -102,8 +102,8 @@ class TechController extends Controller {
                 }
 
                 $sheet = $objPHPExcel->getSheet(0);
-                $this->findImporttechdeductions($sheet,$upld_id);
-                return $this->redirect(['index']);
+                $this->findImporttechdeductions($sheet, $upld_id, $ImportType);
+                //return $this->redirect(['index']);
             } else {
                 \Yii::$app->session->setFlash('error', 'Only files with these extensions are allowed: xls, xlsx');
             }
@@ -114,10 +114,13 @@ class TechController extends Controller {
         ]);
     }
 
-    public function findImporttechdeductions($sheet, $upld_id = NULL) {
+    public function findImporttechdeductions($sheet, $upld_id = NULL, $ImportType = NULL) {
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
-        if ($highestColumn == 'I') {
+
+        if ($ImportType == "onetime" && $highestColumn == 'G') {
+            /* One Time Deduction Import - Start */
+            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Deduction Date, [4] => Work Order, [5] => Amount, [6] => Comments
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
                 if ($row == 1) {
@@ -127,25 +130,13 @@ class TechController extends Controller {
                 foreach ($rowData[0] as $key => $val) {
                     $rowData[0][$key] = trim($rowData[0][$key]);
                 }
-
-
-//                [0] => 70034
-//                [1] => On-going deduction
-//                [2] => Truck
-//                [3] => 05/15/2018
-//                [4] =>
-//                [5] =>
-//                [6] => 4
-//                [7] => 150
-//                [8] =>
-
+                /* Check Tech ID Empty or not */
                 $techid = $rowData[0][0];
-                if($techid==''){
+                if ($techid == '') {
                     continue;
                 }
-                $umodel = User::find()
-                        ->where(['techid' => $techid])
-                        ->one();
+                /* Check Tech ID Exist or not */
+                $umodel = User::find()->where(['techid' => $techid])->one();
                 if (!empty($umodel)) {
                     $uid = $umodel->id;
                 } else {
@@ -153,36 +144,123 @@ class TechController extends Controller {
                 }
                 $model = new TechDeductions();
                 $model->user_id = $uid;
-                if ($rowData[0][1] && array_key_exists($rowData[0][1], TechDeductions::$categories)) {
-                    $model->category = $rowData[0][1];//TechDeductions::$categories[$rowData[0][1]];
+
+                /* Check Category type Onetime or not */
+                if (strtolower($rowData[0][1]) == "onetime") {
+                    $model->category = strtolower($rowData[0][1]);
                 } else {
                     continue;
                 }
-                if ($model->category == "periodic" && ($rowData[0][4] == '' || $rowData[0][5] == '')) {
+                $model->deduction_info = $rowData[0][2];
+                $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                $model->work_order = $rowData[0][4];
+                $model->total = $rowData[0][5];
+                $model->description = $rowData[0][6];
+                $model->upload_id = $upld_id;
+                $model->created_at = date('Y-m-d H:i:s');
+                $model->created_by = Yii::$app->user->id;
+
+                if ($model->save()) {
+                    \Yii::$app->session->setFlash('success', 'OneTime Tech Deduction Imported Successfully');
+                } else {
+                    //$erros = json_encode($model->errors);
+                    \Yii::$app->session->setFlash('error', 'Failed to Import OneTime Tech Deduction. Please try again');
+                }
+            }
+            /* One Time Deduction Import - End */
+        } else if ($ImportType == "ongoing" && $highestColumn == 'I') {
+            /* Ongoing Deduction Import - Start */
+            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Deduction Date, [4] => Serial Number, [5] => Amount, [6] => Yes/No
+            // [7] => Vin#, [8] => Percentage
+            $success_flag=0;
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+                if ($row == 1) {
                     continue;
                 }
-                $model->deduction_info = $rowData[0][2];
-                $model->deduction_date = date("Y-m-d", strtotime($rowData[0][3]));
-                if ($model->category == "periodic") {
-                    $model->startdate = date("Y-m-d", strtotime($rowData[0][4]));
-                    $model->enddate = date("Y-m-d", strtotime($rowData[0][5]));
+                // trim the values
+                foreach ($rowData[0] as $key => $val) {
+                    $rowData[0][$key] = trim($rowData[0][$key]);
                 }
-                if ($model->category != "onetime"){
-                $model->qty = $rowData[0][6];
+                /* Check Tech ID Empty or not */
+                $techid = $rowData[0][0];
+                if ($techid == '') {
+                    continue;
                 }
-                
-                $model->total = $rowData[0][7];
-                $model->description = $rowData[0][8];
+                /* Check Tech ID Exist or not */
+                $umodel = User::find()->where(['techid' => $techid])->one();
+                if (!empty($umodel)) {
+                    $uid = $umodel->id;
+                } else {
+                    continue;
+                }
+
+                $model = new TechDeductions();
+                $model->user_id = $uid;
+
+                /* Check Category type Onetime or not */
+                if (strtolower($rowData[0][1]) == "ongoing") {
+                    $model->category = strtolower($rowData[0][1]);
+                } else {
+                    continue;
+                }
+
+                if ($rowData[0][2] == '') {
+                    continue;
+                } else {
+                    $model->deduction_info = $rowData[0][2];
+                }
                 $model->upload_id = $upld_id;
-                if ($model->save())
-                {
-                     \Yii::$app->session->setFlash('success', 'Tech Deduction Imported Successfully');
+                $model->created_at = date('Y-m-d H:i:s');
+                $model->created_by = Yii::$app->user->id;
+                switch (strtolower($rowData[0][2])) {
+                    case "meter":
+                        if ($rowData[0][3] != '' && $rowData[0][4] != '' && $rowData[0][5] != '') {
+                            $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                            $model->serial_num = $rowData[0][4];
+                            $model->total = $rowData[0][5];
+                            if ($model->save()) {
+                                $success_flag=$success_flag+1;
+                            }
+                        }
+                        break;
+                    case "truck":
+                        if ($rowData[0][3] != '' && $rowData[0][6] != '' && $rowData[0][7] != '' && $rowData[0][5] != '') {
+                            $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                            $yes_or_no = strtolower($rowData[0][6]);
+                            $model->yes_or_no = ($yes_or_no == "yes") ? "1" : "0";
+                            $model->vin = $rowData[0][7];
+                            $model->total = $rowData[0][5];
+                            if ($model->save()) {
+                                $success_flag=$success_flag+1;
+                            }
+                            
+                        }
+                        break;
+                    case "wc/gl":
+                        if ($rowData[0][6] != '' && $rowData[0][8] != '') {
+                            $yes_or_no = strtolower($rowData[0][6]);
+                            $model->yes_or_no = ($yes_or_no == "yes") ? "1" : "0";
+                            $model->percentage = $rowData[0][8];
+                            if ($model->save()) {
+                                $success_flag=$success_flag+1;
+                            }
+                        }
+                        break;
+                    default:
+                        \Yii::$app->session->setFlash('error', 'Deduction Type does not match. Please try again.');
+                        break;
                 }
-                else {
-                     \Yii::$app->session->setFlash('error', 'Failed to Import Tech Deduction. Please try again');
+                if ($success_flag) {
+                    \Yii::$app->session->setFlash('success', 'Ongoing Tech Deduction Imported Successfully');
+                } else {
+                    //$erros = json_encode($model->errors);
+                    \Yii::$app->session->setFlash('error', 'Failed to Import Ongoing Tech Deduction. Please try again');
                 }
-                
             }
+            /* Ongoing Deduction Import - End */
+        } else {
+            \Yii::$app->session->setFlash('error', 'Type and excelsheet format should be same');
         }
     }
 

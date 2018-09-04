@@ -48,7 +48,7 @@ class Billing extends ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'file'], 'required'],
+            [['type'], 'required'],
             [['user_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at'], 'integer'],
             [['type', 'wo_complete_date', 'date', 'file'], 'safe'],
             [['total'], 'number'],
