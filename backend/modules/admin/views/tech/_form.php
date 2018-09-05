@@ -19,38 +19,38 @@ use yii\grid\GridView;
 
 $querys_new = Location::find()->andWhere('status = :status and isDeleted = :delete', [':status' => 10, ':delete' => 0])->all();
 $location = ArrayHelper::map($querys_new, "id", function ($model, $defaultValue) {
-    $sinfo = $model->location;
+            $sinfo = $model->location;
 
-    return $sinfo;
-});
+            return $sinfo;
+        });
 
 $vendor = '';
 $querys_new1 = Vendor::find()->andWhere('status = :status and deleted_at = :delete', [':status' => 10, ':delete' => 0])->all();
 $vendor = ArrayHelper::map($querys_new1, "id", function ($model, $defaultValue) {
-    $sinfo = $model->vendor_type;
+            $sinfo = $model->vendor_type;
 
-    return $sinfo;
-});
+            return $sinfo;
+        });
 if ($model->isNewRecord)
     $vendor += array('-1' => 'other');
 ?>
 
-    <section class="content">
-        <div class="row">
-            <!-- left column -->
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="nav-tabs-custom">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab_1" data-toggle="tab"><b>Technical Information</b></a></li>
-                        <li><a href="#tab_2" data-toggle="tab"><b>Vehicle Information</b></a></li>
-                        <li><a href="#tab_3" data-toggle="tab"><b>Official Information</b></a></li>
-                        <?php if (!$model->isNewRecord) {?>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab_1" data-toggle="tab"><b>Technical Information</b></a></li>
+                    <li><a href="#tab_2" data-toggle="tab"><b>Vehicle Information</b></a></li>
+                    <li><a href="#tab_3" data-toggle="tab"><b>Official Information</b></a></li>
+                    <?php if (!$model->isNewRecord) { ?>
                         <li><a href="#tab_4" data-toggle="tab"><b>Deductions</b></a></li>
-                        <?php } ?>
-                    </ul>
-                    <?php
-                    $form = ActiveForm::begin(['id' => 'active-form',
+                    <?php } ?>
+                </ul>
+                <?php
+                $form = ActiveForm::begin(['id' => 'active-form',
                             'options' => [
                                 'class' => 'form-horizontal',
 //                                'enctype' => 'multipart/form-data',
@@ -61,248 +61,248 @@ if ($model->isNewRecord)
                             ],
                             'enableAjaxValidation' => false,
                             'enableClientValidation' => true,
-                        ]
-                    );
-                    ?>
+                                ]
+                );
+                ?>
 
-                    <div class="tab-content">
+                <div class="tab-content">
 
-                        <div class="tab-pane active" id="tab_1">
-                            <div class="box box-primary">
-                                <div class="box-body">
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'techid')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord])->label('Tech ID*'); ?>
-                                        </div>
-                                        <div class="col-md-6">
+                    <div class="tab-pane active" id="tab_1">
+                        <div class="box box-primary">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'techid')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord])->label('Tech ID*'); ?>
+                                    </div>
+                                    <div class="col-md-6">
 
-                                            <?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
-                                        </div>
+                                        <?= $form->field($model, 'firstname')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <?php
+                                    if (!$model->isNewRecord)
+                                        $model->password_hash = '';
+                                    ?>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'password_hash')->passwordInput(['maxlength' => true])->label('Password*') ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'username')->textInput(['maxlength' => true])->label('User Name*') ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech, 'work_status')->dropDownList(TechProfile::$workstatusList, ['class' => 'form-control', 'prompt' => '--- Select Work Status ---'])->label('Work Status') ?>
                                     </div>
 
-                                    <div class="form-group">
-                                        <?php
-                                        if (!$model->isNewRecord)
-                                            $model->password_hash = '';
+                                </div>
+                                <?php //   if($tech->isNewRecord){ ?>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech, 'vendor_id')->dropDownList($vendor, ['class' => 'form-control', 'prompt' => '--- Select Vendor ---'])->label('Vendor') ?>
+                                        <div class="other-field">
+                                            <?= $form->field($tech, 'other')->textInput(['maxlength' => true])->label('') ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech, 'location_id')->dropDownList($location, ['class' => 'form-control', 'prompt' => '--- Select Location ---'])->label('Location') ?>
+                                    </div>
+
+                                </div>
+                                <?php // } ?>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?Php
+                                        if (isset($tech->dob))
+                                            $tech->dob = Billing::dateFormat($tech->dob);
                                         ?>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'password_hash')->passwordInput(['maxlength' => true])->label('Password*') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'lastname')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'username')->textInput(['maxlength' => true])->label('User Name*') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech, 'work_status')->dropDownList(TechProfile::$workstatusList, ['class' => 'form-control', 'prompt' => '--- Select Work Status ---'])->label('Work Status') ?>
-                                        </div>
+                                        <?= $form->field($tech, 'dob')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('DOB')->label('<i class="fa fa-calendar"></i> DOB') ?>
 
                                     </div>
-                                    <?php //   if($tech->isNewRecord){ ?>
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech, 'vendor_id')->dropDownList($vendor, ['class' => 'form-control', 'prompt' => '--- Select Vendor ---'])->label('Vendor') ?>
-                                            <div class="other-field">
-                                                <?= $form->field($tech, 'other')->textInput(['maxlength' => true])->label('') ?>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech, 'location_id')->dropDownList($location, ['class' => 'form-control', 'prompt' => '--- Select Location ---'])->label('Location') ?>
-                                        </div>
-
-                                    </div>
-                                    <?php // } ?>
-
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?Php
-                                            if (isset($tech->dob))
-                                                $tech->dob = Billing::dateFormat($tech->dob);
-                                            ?>
-                                            <?= $form->field($tech, 'dob')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('DOB')->label('<i class="fa fa-calendar"></i> DOB') ?>
-
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'addr')->textarea(['maxlength' => true]) ?>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'city')->textInput(['maxlength' => true]); ?>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'email')->textInput(['maxlength' => true]); ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'state')->textInput(['maxlength' => true]) ?>
-                                        </div>
-
-
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?php
-                                            if ($model->isNewRecord)
-                                                $model->status = '10';
-                                            ?>
-                                            <?= $form->field($model, 'status')->radioList(['10' => 'Enabled', '0' => 'Disabled']) ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($model, 'zip')->textInput(['maxlength' => true]) ?>
-                                        </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'addr')->textarea(['maxlength' => true]) ?>
                                     </div>
 
                                 </div>
-                                <div class="box-footer">
-                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'city')->textInput(['maxlength' => true]); ?>
+                                    </div>
+
                                 </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'email')->textInput(['maxlength' => true]); ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'state')->textInput(['maxlength' => true]) ?>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?php
+                                        if ($model->isNewRecord)
+                                            $model->status = '10';
+                                        ?>
+                                        <?= $form->field($model, 'status')->radioList(['10' => 'Enabled', '0' => 'Disabled']) ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($model, 'zip')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="box-footer">
+                                <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
                             </div>
                         </div>
-                        <div class="tab-pane" id="tab_2">
-                            <div class="box box-primary">
-                                <div class="box-body">
+                    </div>
+                    <div class="tab-pane" id="tab_2">
+                        <div class="box box-primary">
+                            <div class="box-body">
 
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'license_plate')->textInput(['maxlength' => true]); ?>
-                                        </div>
-                                        <div class="col-md-6">
-
-                                            <?= $form->field($tech_vehicle, 'state')->textInput(['maxlength' => true]) ?>
-                                        </div>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_vehicle, 'license_plate')->textInput(['maxlength' => true]); ?>
                                     </div>
+                                    <div class="col-md-6">
 
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?php /* echo $form->field($tech_vehicle, 'registration')->textInput(['maxlength' => true]) */ ?>
-                                            <?= $form->field($tech_vehicle, 'reg_exp')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                           <?= $form->field($tech_vehicle, 'insurance_company')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'insurance_exp')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                           <?= $form->field($tech_vehicle, 'driver_license')->textInput(['maxlength' => true]) ?> 
-                                        </div>
-
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_vehicle, 'issuing_state')->textInput(['maxlength' => true]) ?> 
-                                        </div>
-                                        <div class="col-md-6">
-                                           
-                                        </div>
-
+                                        <?= $form->field($tech_vehicle, 'state')->textInput(['maxlength' => true]) ?>
                                     </div>
                                 </div>
-                                <div class="box-footer">
-                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?php /* echo $form->field($tech_vehicle, 'registration')->textInput(['maxlength' => true]) */ ?>
+                                        <?= $form->field($tech_vehicle, 'reg_exp')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_vehicle, 'insurance_company')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_vehicle, 'insurance_exp')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_vehicle, 'driver_license')->textInput(['maxlength' => true]) ?> 
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_vehicle, 'issuing_state')->textInput(['maxlength' => true]) ?> 
+                                    </div>
+                                    <div class="col-md-6">
+
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
-                        <!-- /.tab-pane -->
-                        <div class="tab-pane" id="tab_3">
-                            <div class="box box-primary">
-                                <div class="box-body">
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?Php
-                                            if (isset($tech_offcl->hire_date))
-                                                $tech_offcl->hire_date = Billing::dateFormat($tech_offcl->hire_date);
-                                            ?>
-                                            <?= $form->field($tech_offcl, 'hire_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Hire Date'); ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_offcl, 'job_desc')->dropDownList(TechProfile::$jobdescList, ['class' => 'form-control', 'prompt' => '--- Select Job Description ---'])->label('Position Of Job Description') ?>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_offcl, 'vid')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_offcl, 'pid')->textInput(['maxlength' => true]) ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?Php
-                                            if (isset($tech_offcl->badge_exp_date))
-                                                $tech_offcl->badge_exp_date = Billing::dateFormat($tech_offcl->badge_exp_date);
-                                            ?>
-                                            <?= $form->field($tech_offcl, 'badge_exp_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Badge Expiry Date') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <?Php
-                                            if (isset($tech_offcl->hire_date))
-                                                $tech_offcl->last_background_check = Billing::dateFormat($tech_offcl->last_background_check);
-                                            ?>
-                                            <?= $form->field($tech_offcl, 'last_background_check')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Last Background Check'); ?>
-                                        </div>
-
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <?Php
-                                            if (isset($tech_offcl->term_date))
-                                                $tech_offcl->term_date = Billing::dateFormat($tech_offcl->term_date);
-                                            ?>
-                                            <?= $form->field($tech_offcl, 'term_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Term Date') ?>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <?= $form->field($tech_offcl, 'rate_code_type')->radioList(['In' => 'In House', 'Cp' => 'Corporate']) ?>
-                                            <div class="inhouse">
-                                                <?php $tech_offcl->inhouse = $tech_offcl->rate_code_val; ?>
-                                                <?= $form->field($tech_offcl, 'inhouse')->dropDownList(TechOfficial::$inhouseList, ['class' => 'form-control', 'prompt' => '--- Select In House Option ---'])->label('') ?>
-                                            </div>
-                                            <div class="corporate">
-                                                <?php $tech_offcl->corporate = $tech_offcl->rate_code_val; ?>
-                                                <?= $form->field($tech_offcl, 'corporate')->dropDownList(TechOfficial::$corporateList, ['class' => 'form-control', 'prompt' => '--- Select Corporate Option ---'])->label('') ?>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="box-footer">
-                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
-                                </div>
+                            <div class="box-footer">
+                                <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
                             </div>
                         </div>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_3">
+                        <div class="box box-primary">
+                            <div class="box-body">
 
-                        <?php if (!$model->isNewRecord) {?>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?Php
+                                        if (isset($tech_offcl->hire_date))
+                                            $tech_offcl->hire_date = Billing::dateFormat($tech_offcl->hire_date);
+                                        ?>
+                                        <?= $form->field($tech_offcl, 'hire_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Hire Date'); ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_offcl, 'job_desc')->dropDownList(TechProfile::$jobdescList, ['class' => 'form-control', 'prompt' => '--- Select Job Description ---'])->label('Position Of Job Description') ?>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_offcl, 'vid')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_offcl, 'pid')->textInput(['maxlength' => true]) ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?Php
+                                        if (isset($tech_offcl->badge_exp_date))
+                                            $tech_offcl->badge_exp_date = Billing::dateFormat($tech_offcl->badge_exp_date);
+                                        ?>
+                                        <?= $form->field($tech_offcl, 'badge_exp_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Badge Expiry Date') ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?Php
+                                        if (isset($tech_offcl->hire_date))
+                                            $tech_offcl->last_background_check = Billing::dateFormat($tech_offcl->last_background_check);
+                                        ?>
+                                        <?= $form->field($tech_offcl, 'last_background_check')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Last Background Check'); ?>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?Php
+                                        if (isset($tech_offcl->term_date))
+                                            $tech_offcl->term_date = Billing::dateFormat($tech_offcl->term_date);
+                                        ?>
+                                        <?= $form->field($tech_offcl, 'term_date')->textInput(['class' => 'form-control datepicker'], ['maxlength' => true])->label('<i class="fa fa-calendar"></i> Term Date') ?>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <?= $form->field($tech_offcl, 'rate_code_type')->radioList(['In' => 'In House', 'Cp' => 'Corporate']) ?>
+                                        <div class="inhouse">
+                                            <?php $tech_offcl->inhouse = $tech_offcl->rate_code_val; ?>
+                                            <?= $form->field($tech_offcl, 'inhouse')->dropDownList(TechOfficial::$inhouseList, ['class' => 'form-control', 'prompt' => '--- Select In House Option ---'])->label('') ?>
+                                        </div>
+                                        <div class="corporate">
+                                            <?php $tech_offcl->corporate = $tech_offcl->rate_code_val; ?>
+                                            <?= $form->field($tech_offcl, 'corporate')->dropDownList(TechOfficial::$corporateList, ['class' => 'form-control', 'prompt' => '--- Select Corporate Option ---'])->label('') ?>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <?= Html::submitButton('Save', ['class' => 'btn btn-success save_other']) ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (!$model->isNewRecord) { ?>
                         <div class="tab-pane" id="tab_4">
                             <div class="row">
                                 <div class="col-xs-12">
                                     <div class="box">
                                         <div class="box-header">
                                             <div class="pull-right">
-                                                <?= Html::a('Add Tech Deduction', ['techdeductions/create?tech_id='.$model->id], ['class' => 'btn btn-success']) ?>
+                                                <?= Html::a('Add Tech Deduction', ['techdeductions/create?tech_id=' . $model->id], ['class' => 'btn btn-success']) ?>
                                             </div>
                                         </div>
                                         <div class="box-body">
@@ -325,16 +325,38 @@ if ($model->isNewRecord)
                                                         'label' => 'Deduction date',
                                                         'format' => 'raw',
                                                         'value' => function ($model) {
-                                                            if($model->deduction_date){
-                                                            return date('m/d/Y', strtotime($model->deduction_date));
-                                                            }else{
+                                                            if ($model->deduction_date) {
+                                                                return date('m/d/Y', strtotime($model->deduction_date));
+                                                            } else {
                                                                 return "-";
                                                             }
                                                         },
                                                     ],
-                                                    'qty',
+                                                    // 'qty',
                                                     'total',
-                                                    'updated_at',
+                                                    // 'updated_at',
+                                                    [
+                                                        'label' => 'Start Date',
+                                                        'format' => 'raw',
+                                                        'value' => function ($model) {
+                                                            if ($model->startdate) {
+                                                                return date('m/d/Y', strtotime($model->startdate));
+                                                            } else {
+                                                                return "-";
+                                                            }
+                                                        },
+                                                    ],
+                                                    [
+                                                        'header' => 'End Date',
+                                                        'format' => 'raw',
+                                                        'value' => function ($model) {
+                                                            if ($model->enddate) {
+                                                                return date('m/d/Y', strtotime($model->enddate));
+                                                            } else {
+                                                                return "-";
+                                                            }
+                                                        },
+                                                    ],
                                                     ['class' => 'yii\grid\ActionColumn',
                                                         'template' => '{update}&nbsp;&nbsp;{delete}',
                                                         'buttons' => [
@@ -343,11 +365,11 @@ if ($model->isNewRecord)
                                                             },
                                                             'delete' => function($url, $model) {
                                                                 return Html::a('<i class="fa fa-fw fa-trash"></i>', ['techdeductions/delete', 'id' => $model->id], [
-                                                                    'class' => '',
-                                                                    'data' => [
-                                                                        'confirm' => 'Are you sure you want to delete this tech deduction?',
-                                                                        'method' => 'post',
-                                                                    ],
+                                                                            'class' => '',
+                                                                            'data' => [
+                                                                                'confirm' => 'Are you sure you want to delete this tech deduction?',
+                                                                                'method' => 'post',
+                                                                            ],
                                                                 ]);
 //                            }
                                                             },
@@ -361,16 +383,16 @@ if ($model->isNewRecord)
                                 </div>
                             </div>
                         </div>
-                        <?php } ?>
-                        <?php ActiveForm::end(); ?>
-                    </div>
+                    <?php } ?>
+                    <?php ActiveForm::end(); ?>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 <?php
 $other = Yii::$app->urlManager->createUrl('/admin/tech/getothers');
-$activetab = (@$_GET['tab']) ? : "";
+$activetab = (@$_GET['tab']) ?: "";
 $script = <<< JS
 $(document).ready(function(){
     //Date picker

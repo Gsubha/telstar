@@ -18,3 +18,6 @@
     margin-top: 15px;
     clear: both;
 }
+td.disabled.day {
+    color: #ccc !important;
+}

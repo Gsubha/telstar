@@ -24,12 +24,12 @@ use Yii;
  */
 class TechDeductions extends \yii\db\ActiveRecord {
 
-    public $file, $techid, $van_deduction_date, $van_amount, $van_yes, $wcgl_yes,$onetime_amt,$onetime_deduction_type,$issue_date;
-    public $installment_type,$num_installment,$installment_amount,$installment_comment;
+    public $file, $techid, $van_deduction_date, $van_amount, $van_yes, $wcgl_yes, $onetime_amt, $onetime_deduction_type, $issue_date,$ongoing_type;
+    public $installment_type, $installment_amount, $installment_comment;
     public static $categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction", "installment" => "Installment deduction"];
     public static $ongoing_categories = ["Meter" => "Meter Lease", "Truck" => "Van Lease", "WC/GL" => "WC/GL"];
     public static $wcgl_percentages = ["5" => "5 %", "8" => "8 %", "10" => "10 %", "12" => "12 %", "15" => "15 %"];
-    public static $installment_categories = ['Retainer' => 'Retainer – 5% or 10%','Damages'=>'Damage Claim','Lodging'=>'Lodging','Loan'=>'Loan','Tools'=>'Tools','Lost CPE'=>'Lost CPE'];
+    public static $installment_categories = ['Retainer' => 'Retainer – 5% or 10%', 'Damages' => 'Damage Claim', 'Lodging' => 'Lodging', 'Loan' => 'Loan', 'Tools' => 'Tools', 'Lost CPE' => 'Lost CPE'];
 
     /**
      * {@inheritdoc}
@@ -46,7 +46,7 @@ class TechDeductions extends \yii\db\ActiveRecord {
             [['category'], 'required'],
             [['file'], 'required', 'on' => 'import'],
             //[['user_id', 'category', 'total','deduction_date'], 'required'],
-            [['qty', 'total'], 'number'],
+            [['qty', 'total','num_installment'], 'number'],
             [['created_at', 'updated_at', 'deleted_at', 'description', 'deduction_date', 'category', 'deduction_info', 'ongoing_type', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order', 'van_deduction_date', 'van_amount', 'file'], 'safe'],
             // [['deduction_id'], 'exist', 'skipOnError' => true, 'targetClass' => Deductions::className(), 'targetAttribute' => ['deduction_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -79,13 +79,22 @@ class TechDeductions extends \yii\db\ActiveRecord {
             /* Ongoing Category Validation - End */
 
             /* OneTime Category Validation - Start */
-            [['onetime_deduction_type', 'deduction_date', 'work_order','onetime_amt','description'], 'required', 'when' => function ($model) {
-                     return $model->category == "onetime";
+            [['onetime_deduction_type', 'deduction_date', 'work_order', 'onetime_amt', 'description'], 'required', 'when' => function ($model) {
+                    return $model->category == "onetime";
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#techdeductions-category').val() == 'onetime';
                     }",
             ],
             /* OneTime Category Validation - End */
+
+            /* Installment Category Validation - Start */
+            [['installment_type', 'installment_amount', 'num_installment', 'installment_comment', 'startdate','enddate'], 'required', 'when' => function ($model) {
+                    return $model->category == "installment";
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#techdeductions-category').val() == 'installment';
+                    }",
+            ],
+            /* Installment Category Validation - End */
         ];
     }
 
@@ -119,7 +128,7 @@ class TechDeductions extends \yii\db\ActiveRecord {
             'onetime_amt' => 'Amount',
             'van_amount' => 'Amount',
             'van_deduction_date' => 'Date',
-            'installment_type'=>'Installment Type',
+            'installment_type' => 'Installment Type',
             'num_installment' => 'Number of Installment',
             'installment_amount' => 'Amount',
         ];

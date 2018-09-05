@@ -7,7 +7,6 @@ use yii\widgets\ActiveForm;
 /* @var $model common\models\Techdeductions */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-
 <section class="content">
     <div class="row">
         <!-- left column -->
@@ -83,7 +82,14 @@ use yii\widgets\ActiveForm;
                     <div class="van_lease hideshow ongoing_divs">
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?= $form->field($model, 'van_yes')->checkbox(['label' => ''])->label('Yes'); ?>
+                                <?php
+                                if (@$model->yes_or_no) {
+                                    $model->van_yes = 1;
+                                } else {
+                                    $model->van_yes = 0;
+                                }
+                                echo $form->field($model, 'van_yes')->checkbox(['label' => ''])->label('Yes');
+                                ?>
                             </div>
                         </div>
                         <div class="form-group">
@@ -105,6 +111,13 @@ use yii\widgets\ActiveForm;
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
+                                <?php
+                                if (@$model->total) {
+                                    $model->van_amount = $model->total;
+                                } else {
+                                    $model->van_amount = "";
+                                }
+                                ?>
                                 <?= $form->field($model, 'van_amount')->textInput(['maxlength' => true, 'id' => 'van_amount'])->label('Amount*'); ?>
                             </div>
                         </div>
@@ -112,7 +125,14 @@ use yii\widgets\ActiveForm;
                     <div class="wcgl_lease hideshow ongoing_divs">
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?= $form->field($model, 'wcgl_yes')->checkbox(['label' => ''])->label('Yes'); ?>
+                                <?php
+                                if (@$model->yes_or_no) {
+                                    $model->wcgl_yes = 1;
+                                } else {
+                                    $model->wcgl_yes = 0;
+                                }
+                                echo $form->field($model, 'wcgl_yes')->checkbox(['label' => ''])->label('Yes');
+                                ?>
                             </div>
                         </div>
                         <div class="form-group">
@@ -186,6 +206,13 @@ use yii\widgets\ActiveForm;
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
+                                <?php
+                                if (@$model->total) {
+                                    $model->installment_amount = $model->total;
+                                } else {
+                                    $model->installment_amount = "";
+                                }
+                                ?>
                                 <?= $form->field($model, 'installment_amount')->textInput(['maxlength' => true, 'id' => 'installment_amount'])->label('Amount*'); ?>
                             </div>
                         </div>
@@ -196,17 +223,34 @@ use yii\widgets\ActiveForm;
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
+                                <?php
+                                if (@$model->description) {
+                                    $model->installment_comment = $model->description;
+                                } else {
+                                    $model->installment_comment = "";
+                                }
+                                ?>
                                 <?= $form->field($model, 'installment_comment')->textarea()->label('Comment*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control datepicker', 'id' => 'startweek_date'])->label('<i class="fa fa-calendar"></i> Start Week Date*'); ?>
+                                <?php
+                                if (@$model->startdate) {
+                                    $model->startdate = date('m/d/Y', strtotime($model->startdate));
+                                } 
+                                ?>
+                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control hideweekdays', 'id' => 'inst_startweek_date'])->label('<i class="fa fa-calendar"></i> Start Week Date*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?= $form->field($model, 'enddate')->textInput(['class' => 'form-control datepicker', 'id' => 'endweek_date'])->label('<i class="fa fa-calendar"></i> End Week Date*'); ?>
+                                <?php
+                                if (@$model->enddate) {
+                                    $model->enddate = date('m/d/Y', strtotime($model->enddate));
+                                } 
+                                ?>
+                                <?= $form->field($model, 'enddate')->textInput(['class' => 'form-control hideweekdays', 'id' => 'inst_endweek_date'])->label('<i class="fa fa-calendar"></i> End Week Date*'); ?>
                             </div>
                         </div>
                     </div>
@@ -233,6 +277,11 @@ $(document).ready(function(){
       //dateFormat: 'yy-mm-dd' ,
       autoclose: true
     });
+    
+   $('.hideweekdays').datepicker({
+    daysOfWeekDisabled: [1,2,3,4,5],
+   }); 
+   
     
     $("#techdeductions-category").on("change", function(){
         $(".hideshow").hide();

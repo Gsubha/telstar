@@ -144,6 +144,14 @@ class TechdeductionsController extends Controller {
                         $model->serial_num = $post['TechDeductions']['serial_num'];
                         $model->deduction_date = date('Y-m-d', strtotime($post['TechDeductions']['deduction_date']));
                         $model->total = $post['TechDeductions']['total'];
+
+                        /* empty other fields - start */
+                        $empty_other_meter_fields = ['vin', 'description', 'yes_or_no', 'startdate', 'enddate', 'percentage', 'work_order'];
+                        foreach ($empty_other_meter_fields as $mk => $mv) {
+                            $model->$mv = NULL;
+                        }
+                        /* empty other fields - end */
+
                         if ($model->save()) {
                             return true;
                         } else {
@@ -156,6 +164,12 @@ class TechdeductionsController extends Controller {
                         $model->vin = $post['TechDeductions']['vin'];
                         $model->deduction_date = date('Y-m-d', strtotime($post['TechDeductions']['van_deduction_date']));
                         $model->total = $post['TechDeductions']['van_amount'];
+                        /* empty other fields - start */
+                        $empty_other_truck_fields = ['serial_num', 'description', 'startdate', 'enddate', 'percentage', 'work_order'];
+                        foreach ($empty_other_truck_fields as $mk => $mv) {
+                            $model->$mv = NULL;
+                        }
+                        /* empty other fields - end */
                         if ($model->save()) {
                             return true;
                         } else {
@@ -166,8 +180,12 @@ class TechdeductionsController extends Controller {
                     case "WC/GL":
                         $model->yes_or_no = $post['TechDeductions']['wcgl_yes'];
                         $model->percentage = $post['TechDeductions']['percentage'];
-                        $model->deduction_date = date('Y-m-d', strtotime($post['TechDeductions']['van_deduction_date']));
-                        $model->total = $post['TechDeductions']['van_amount'];
+                        /* empty other fields - start */
+                        $empty_other_wcgl_fields = ['vin', 'serial_num', 'description', 'startdate', 'enddate', 'percentage', 'work_order', 'deduction_date', 'total'];
+                        foreach ($empty_other_wcgl_fields as $mk => $mv) {
+                            $model->$mv = NULL;
+                        }
+                        /* empty other fields - end */
                         if ($model->save()) {
                             return true;
                         } else {
@@ -181,6 +199,32 @@ class TechdeductionsController extends Controller {
                 $model->deduction_info = $post['TechDeductions']['onetime_deduction_type'];
                 $model->deduction_date = date('Y-m-d', strtotime($post['TechDeductions']['deduction_date']));
                 $model->total = $post['TechDeductions']['onetime_amt'];
+                /* empty other fields - start */
+                $empty_other_onetime_fields = ['vin', 'serial_num', 'startdate', 'enddate', 'percentage'];
+                foreach ($empty_other_onetime_fields as $mk => $mv) {
+                    $model->$mv = NULL;
+                }
+                /* empty other fields - end */
+                if ($model->save()) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+                
+            case "installment":
+                $model->deduction_info = $post['TechDeductions']['installment_type'];
+                $model->total = $post['TechDeductions']['installment_amount'];
+                $model->num_installment = $post['TechDeductions']['num_installment'];
+                $model->description = $post['TechDeductions']['installment_comment'];
+                $model->startdate = date('Y-m-d', strtotime($post['TechDeductions']['startdate']));
+                $model->enddate = date('Y-m-d', strtotime($post['TechDeductions']['enddate']));
+                /* empty other fields - start */
+                $empty_other_installment_fields = ['deduction_date', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order'];
+                foreach ($empty_other_installment_fields as $mk => $mv) {
+                    $model->$mv = NULL;
+                }
+                /* empty other fields - end */
                 if ($model->save()) {
                     return true;
                 } else {
