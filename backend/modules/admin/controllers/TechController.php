@@ -2,6 +2,7 @@
 
 namespace backend\modules\admin\controllers;
 
+use common\components\Myclass;
 use common\models\Billing;
 use common\models\ImportFiles;
 use common\models\Location;
@@ -15,7 +16,6 @@ use common\models\TechVehicle;
 use common\models\User;
 use common\models\Vendor;
 use PHPExcel_IOFactory;
-use PHPExcel_Shared_Date;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -152,7 +152,11 @@ class TechController extends Controller {
                     continue;
                 }
                 $model->deduction_info = $rowData[0][2];
-                $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                if (Myclass::validateDate($rowData[0][3])) {
+                    $model->deduction_date = date("Y-m-d", strtotime($rowData[0][3]));
+                } else {
+                    $model->deduction_date = NULL;
+                }
                 $model->work_order = $rowData[0][4];
                 $model->total = $rowData[0][5];
                 $model->description = $rowData[0][6];
@@ -163,7 +167,7 @@ class TechController extends Controller {
                 if ($model->save(false)) {
                     \Yii::$app->session->setFlash('success', 'OneTime Tech Deduction Imported Successfully');
                 } else {
-                   // $erros = json_encode($model->errors);
+                    // $erros = json_encode($model->errors);
                     \Yii::$app->session->setFlash('error', 'Failed to Import OneTime Tech Deduction. Please try again');
                 }
             }
@@ -172,7 +176,7 @@ class TechController extends Controller {
             /* Ongoing Deduction Import - Start */
             // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Deduction Date, [4] => Serial Number, [5] => Amount, [6] => Yes/No
             // [7] => Vin#, [8] => Percentage
-            $success_flag=0;
+            $success_flag = 0;
             for ($row = 1; $row <= $highestRow; $row++) {
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
                 if ($row == 1) {
@@ -216,25 +220,32 @@ class TechController extends Controller {
                 switch (strtolower($rowData[0][2])) {
                     case "meter":
                         if ($rowData[0][3] != '' && $rowData[0][4] != '' && $rowData[0][5] != '') {
-                            $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                            if (Myclass::validateDate($rowData[0][3])) {
+                                $model->deduction_date = date("Y-m-d", strtotime($rowData[0][3]));
+                            } else {
+                                $model->deduction_date = NULL;
+                            }
                             $model->serial_num = $rowData[0][4];
                             $model->total = $rowData[0][5];
                             if ($model->save(false)) {
-                                $success_flag=$success_flag+1;
+                                $success_flag = $success_flag + 1;
                             }
                         }
                         break;
                     case "truck":
                         if ($rowData[0][3] != '' && $rowData[0][6] != '' && $rowData[0][7] != '' && $rowData[0][5] != '') {
-                            $model->deduction_date = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][3]));
+                            if (Myclass::validateDate($rowData[0][3])) {
+                                $model->deduction_date = date("Y-m-d", strtotime($rowData[0][3]));
+                            } else {
+                                $model->deduction_date = NULL;
+                            }
                             $yes_or_no = strtolower($rowData[0][6]);
                             $model->yes_or_no = ($yes_or_no == "yes") ? "1" : "0";
                             $model->vin = $rowData[0][7];
                             $model->total = $rowData[0][5];
                             if ($model->save(false)) {
-                                $success_flag=$success_flag+1;
+                                $success_flag = $success_flag + 1;
                             }
-                            
                         }
                         break;
                     case "wc/gl":
@@ -243,7 +254,7 @@ class TechController extends Controller {
                             $model->yes_or_no = ($yes_or_no == "yes") ? "1" : "0";
                             $model->percentage = $rowData[0][8];
                             if ($model->save(false)) {
-                                $success_flag=$success_flag+1;
+                                $success_flag = $success_flag + 1;
                             }
                         }
                         break;
@@ -273,7 +284,7 @@ class TechController extends Controller {
                 }
                 /* Check Tech ID Empty or not */
                 $techid = $rowData[0][0];
-                if ($techid == '' || $rowData[0][6]=='' || $rowData[0][7]=='' || $rowData[0][4]=='') {
+                if ($techid == '' || $rowData[0][6] == '' || $rowData[0][7] == '' || $rowData[0][4] == '') {
                     continue;
                 }
                 /* Check Tech ID Exist or not */
@@ -292,14 +303,24 @@ class TechController extends Controller {
                 } else {
                     continue;
                 }
-                
+
                 $model->deduction_info = $rowData[0][2];
                 $model->total = $rowData[0][3];
-                $model->num_installment =  $rowData[0][4];
+                $model->num_installment = $rowData[0][4];
                 $model->description = $rowData[0][5];
-                $model->startdate = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][6]));
-                $model->enddate = date("Y-m-d", PHPExcel_Shared_Date::ExcelToPHP($rowData[0][7]));
-                
+
+                if (Myclass::validateDate($rowData[0][6])) {
+                    $model->startdate = date("Y-m-d", strtotime($rowData[0][6]));
+                } else {
+                    $model->startdate = NULL;
+                }
+
+                if (Myclass::validateDate($rowData[0][7])) {
+                    $model->enddate = date("Y-m-d", strtotime($rowData[0][7]));
+                } else {
+                    $model->enddate = NULL;
+                }
+
                 $model->upload_id = $upld_id;
                 $model->created_at = date('Y-m-d H:i:s');
                 $model->created_by = Yii::$app->user->id;
@@ -307,7 +328,7 @@ class TechController extends Controller {
                 if ($model->save(false)) {
                     \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
                 } else {
-                   // $erros = json_encode($model->errors);
+                    // $erros = json_encode($model->errors);
                     \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
                 }
             }
@@ -555,7 +576,7 @@ class TechController extends Controller {
 
     public function actionDelete($id) {
         $this->findModel($id)->delete();
-        $billing=new Billing();
+        $billing = new Billing();
         $billing->changeDeleteStatus($id);
         Yii::$app->getSession()->setFlash('success', 'Tech deleted successfully');
         return $this->redirect(['index']);
