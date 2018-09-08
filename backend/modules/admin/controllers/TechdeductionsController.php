@@ -3,6 +3,7 @@
 namespace backend\modules\admin\controllers;
 
 use common\models\Deductions;
+use common\models\InstalmentDeductions;
 use common\models\TechDeductions;
 use common\models\TechDeductionsSearch;
 use Yii;
@@ -90,7 +91,7 @@ class TechdeductionsController extends Controller {
     public function actionCreate() {
         $model = new TechDeductions();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post())) {
             if ($this->_save($model)) {
                 Yii::$app->getSession()->setFlash('success', 'Tech Deduction created successfully!');
                 return $this->redirect(['tech/update?id=' . $model->user_id . "&tab=4"]);
@@ -118,7 +119,7 @@ class TechdeductionsController extends Controller {
     public function actionUpdate($id) {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post())) {
             $this->_save($model);
             Yii::$app->getSession()->setFlash('success', 'Tech Deduction updated successfully');
             return $this->redirect(['tech/update?id=' . $model->user_id . "&tab=4"]);
@@ -211,20 +212,51 @@ class TechdeductionsController extends Controller {
                     return false;
                 }
                 break;
-                
+
             case "installment":
-                $model->deduction_info = $post['TechDeductions']['installment_type'];
-                $model->total = $post['TechDeductions']['installment_amount'];
-                $model->num_installment = $post['TechDeductions']['num_installment'];
-                $model->description = $post['TechDeductions']['installment_comment'];
-                $model->startdate = date('Y-m-d', strtotime($post['TechDeductions']['startdate']));
-                $model->enddate = date('Y-m-d', strtotime($post['TechDeductions']['enddate']));
-                /* empty other fields - start */
-                $empty_other_installment_fields = ['deduction_date', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order'];
-                foreach ($empty_other_installment_fields as $mk => $mv) {
-                    $model->$mv = NULL;
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $model->deduction_info = $post['TechDeductions']['installment_type'];
+                    $model->total = $post['TechDeductions']['installment_amount'];
+                    $model->num_installment = $post['TechDeductions']['num_installment'];
+                    $model->description = $post['TechDeductions']['installment_comment'];
+                    $model->startdate = date('Y-m-d', strtotime($post['TechDeductions']['startdate']));
+                    //$model->enddate = date('Y-m-d', strtotime($post['TechDeductions']['enddate']));
+                    $days = (($model->num_installment * 7) - 1);
+                    $model->enddate = date('Y-m-d', strtotime($post['TechDeductions']['startdate'] . " +$days days"));
+                    /* empty other fields - start */
+                    $empty_other_installment_fields = ['deduction_date', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order'];
+                    foreach ($empty_other_installment_fields as $mk => $mv) {
+                        $model->$mv = NULL;
+                    }
+                    /* empty other fields - end */
+                    if ($model->save()) {
+
+                        if ($model->isNewRecord) {
+                            $pid = Yii::$app->db->getLastInsertID();
+                        } else {
+                            $pid = $model->id;
+                            InstalmentDeductions::deleteAll(['tech_deductions_id' => $pid]);
+                        }
+                        $StDate = $model->startdate;
+                        $num_inst = $model->num_installment;
+                        $inst_price = number_format((float) ($model->total / $num_inst), 2, '.', '');
+                        for ($i = 1; $i <= $num_inst; $i++) {
+                            $inst_model = new InstalmentDeductions();
+                            $inst_model->tech_deductions_id = $pid;
+                            $inst_model->inst_start_date = $StDate;
+                            $inst_model->inst_end_date = date('Y-m-d', strtotime($StDate . ' + 6 days'));
+                            $inst_model->inst_paid_amt = $inst_price;
+                            $inst_model->total_paid_amt = $inst_price*$i;
+                            $inst_model->remain_amt = $model->total - $inst_model->total_paid_amt;
+                            $inst_model->save();
+                            $StDate = date('Y-m-d', strtotime($StDate . ' + 7 days'));
+                        }
+                    }
+                    $transaction->commit();
+                } catch (Exception $e) {
+                    $transaction->rollBack();
                 }
-                /* empty other fields - end */
                 if ($model->save()) {
                     return true;
                 } else {

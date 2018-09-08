@@ -213,12 +213,12 @@ use yii\widgets\ActiveForm;
                                     $model->installment_amount = "";
                                 }
                                 ?>
-                                <?= $form->field($model, 'installment_amount')->textInput(['maxlength' => true, 'id' => 'installment_amount'])->label('Amount*'); ?>
+                                <?= $form->field($model, 'installment_amount')->textInput(['maxlength' => true, 'class' => 'form-control autogen', 'id' => 'installment_amount'])->label('Amount*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-8">
-                                <?= $form->field($model, 'num_installment')->textInput(['maxlength' => true])->label('Number of Installments*'); ?>
+                                <?= $form->field($model, 'num_installment')->textInput(['maxlength' => true, 'class' => 'form-control autogen'])->label('Number of Installments*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
@@ -238,9 +238,9 @@ use yii\widgets\ActiveForm;
                                 <?php
                                 if (@$model->startdate) {
                                     $model->startdate = date('m/d/Y', strtotime($model->startdate));
-                                } 
+                                }
                                 ?>
-                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control hideweekdays', 'id' => 'inst_startweek_date'])->label('<i class="fa fa-calendar"></i> Start Week Date*'); ?>
+                                <?= $form->field($model, 'startdate')->textInput(['class' => 'form-control hideweekdays autogen', 'id' => 'inst_startweek_date'])->label('<i class="fa fa-calendar"></i> Start Week Date*'); ?>
                             </div>
                         </div>
                         <div class="form-group">
@@ -248,11 +248,39 @@ use yii\widgets\ActiveForm;
                                 <?php
                                 if (@$model->enddate) {
                                     $model->enddate = date('m/d/Y', strtotime($model->enddate));
-                                } 
+                                }
                                 ?>
-                                <?= $form->field($model, 'enddate')->textInput(['class' => 'form-control hideweekdays', 'id' => 'inst_endweek_date'])->label('<i class="fa fa-calendar"></i> End Week Date*'); ?>
+                                <label class="col-sm-3 control-label" for="inst_endweek_date"><i class="fa fa-calendar"></i> End Week Date*</label>
+                                <div class="col-sm-8">
+                                    <label class="inst_enddate"><?php echo @$model->enddate; ?></label>
+                                    <input type="hidden" value="<?php echo @$model->enddate; ?>" id="inst_enddate" />
+                                </div>
                             </div>
                         </div>
+                        <div class="form-group autotable_div">
+                            <div class="col-md-8">
+                                <label class="col-sm-3 control-label">&nbsp;</label>
+                                <div class="col-sm-8 autotable">
+                                    <?php
+                                    if (!$model->isNewRecord) {
+                                        echo "<center><code><big>Installment Deduction</big></code></center>";
+                                        echo "<table class='table'>";
+                                        echo "<th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th>";
+                                        $StDate = date('m/d/Y', strtotime($model->startdate));
+                                        $num_inst = $model->num_installment;
+                                        $inst_price = number_format((float) ($model->total / $num_inst), 2, '.', '');
+                                        for ($i = 1; $i <= $num_inst; $i++) {
+                                            echo "<tr><td>$i</td><td>$StDate<td>" . date('m/d/Y', strtotime($StDate . ' + 6 days')) . "</td><td>$inst_price</td>";
+                                            $model->inst_start_date = $StDate;
+                                            $StDate = date('m/d/Y', strtotime($StDate . ' + 7 days'));
+                                        }
+                                        echo "</table>";
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <?php /* Installment Deduction form - End */ ?>
 
@@ -272,14 +300,18 @@ $(document).ready(function(){
     $(".hideshow").hide();
     var category = '{$model->category}';
     showFields(category);
+    $(".autogen").on("blur", function(){
+    get_end_date();
+    });
+    
     
     $('.datepicker').datepicker({
       //dateFormat: 'yy-mm-dd' ,
       autoclose: true
     });
-    
+   
    $('.hideweekdays').datepicker({
-    daysOfWeekDisabled: [1,2,3,4,5],
+    daysOfWeekDisabled: [1,2,3,4,5,6],
    }); 
    
     
@@ -342,10 +374,81 @@ $(document).ready(function(){
             break;
         }
     }
+                
+    function get_end_date() {
+        var start_date = document.getElementById('inst_startweek_date').value;
+        var ins_count= $("#techdeductions-num_installment").val();
+        var amt = $("#installment_amount").val();
+        var err_msg='';
+        if(amt==''){
+        err_msg='Please fill amount';
+        }
+        if(ins_count==''){
+        err_msg=err_msg + ' <br> Please fill number of instalment value';
+        }       
+        
+        if(err_msg=='' && (parseInt(ins_count) > 0) && (Number(amt) > 0) && start_date!='')
+        {
+        
+        var date = new Date(start_date);
+        var newdate = new Date(date);
+        var days_count = (7*ins_count)-1;
+        newdate.setDate(newdate.getDate() + days_count);
+
+        var dd = ('0' + newdate.getDate()).slice(-2); 
+        var mm = ('0' + (newdate.getMonth()+1)).slice(-2);
+        var y = newdate.getFullYear();
+
+        var endDate = mm + '/' + dd + '/' + y;
+        $(".inst_enddate").html(endDate);
+        document.getElementById('inst_enddate').value = endDate;
+        generate_table(start_date,ins_count,amt);
+        $(".autotable_div").show();
+        }
+        else{
+          $(".autotable_div").hide();
+          $(".autotable").html('');
+          $(".inst_enddate").html('');
+          document.getElementById('inst_enddate').value = '';     
+        }
+    }
+                
+    function generate_table(start_date, ins_count, amt)
+    {
+        var table_start = "<table class='table'>";
+        var table_heading = "<th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th>";
+        var inst_amt = ((parseFloat)(amt) / (parseInt)(ins_count)).toFixed(2);
+        var table_rows = '';
+        for (i = 1; i <= ins_count; i++)
+        {
+            var startDate = new Date(start_date);
+            var newdate = new Date(startDate);
+            var days_count = 6 ;
+            newdate.setDate(newdate.getDate() + days_count);
+            var dd = ('0' + newdate.getDate()).slice(-2); 
+            var mm = ('0' + (newdate.getMonth()+1)).slice(-2);
+            var y =  newdate.getFullYear();
+
+            var endDate = mm + '/' + dd + '/' + y;
+            table_rows += "<tr><td>"+i+"</td><td>" + start_date + "</td><td>" + endDate + "</td><td>$ " + inst_amt + "</td>";
+            new_start_date = new Date(endDate);
+            new_start_date.setDate(new_start_date.getDate() + 1);
+
+            var new_dd = ('0' + new_start_date.getDate()).slice(-2);
+            var new_mm = ('0' + (new_start_date.getMonth()+1)).slice(-2);
+            var new_y = new_start_date.getFullYear();
+
+            var start_date = new_mm + '/' + new_dd + '/' + new_y;
+            
+        }
+        var table_end = "</table>";
+        var table_datas = "<center><code><big>Installment Deduction</big></code></center>"+table_start + table_heading + table_rows + table_end;
+        $(".autotable").html(table_datas);
+    }
+                
+    
     
 });
 JS;
 $this->registerJs($script, \yii\web\View::POS_END);
 ?>
-
-

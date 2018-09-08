@@ -26,6 +26,7 @@ class TechDeductions extends \yii\db\ActiveRecord {
 
     public $file, $techid, $van_deduction_date, $van_amount, $van_yes, $wcgl_yes, $onetime_amt, $onetime_deduction_type, $issue_date,$ongoing_type;
     public $installment_type, $installment_amount, $installment_comment;
+    public $inst_start_date,$inst_end_date,$total_amt_paid,$remain_amt,$inst_no,$inst_paid_amt,$total_paid_amt;
     public static $categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction", "installment" => "Installment deduction"];
     public static $ongoing_categories = ["Meter" => "Meter Lease", "Truck" => "Van Lease", "WC/GL" => "WC/GL"];
     public static $wcgl_percentages = ["5" => "5 %", "8" => "8 %", "10" => "10 %", "12" => "12 %", "15" => "15 %"];
@@ -46,7 +47,8 @@ class TechDeductions extends \yii\db\ActiveRecord {
             [['category'], 'required'],
             [['file'], 'required', 'on' => 'import'],
             //[['user_id', 'category', 'total','deduction_date'], 'required'],
-            [['qty', 'total','num_installment'], 'number'],
+            [['num_installment'], 'integer','min'=>1],
+            [['total','installment_amount'], 'number','min'=>1],
             [['created_at', 'updated_at', 'deleted_at', 'description', 'deduction_date', 'category', 'deduction_info', 'ongoing_type', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order', 'van_deduction_date', 'van_amount', 'file'], 'safe'],
             // [['deduction_id'], 'exist', 'skipOnError' => true, 'targetClass' => Deductions::className(), 'targetAttribute' => ['deduction_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -159,6 +161,10 @@ class TechDeductions extends \yii\db\ActiveRecord {
         } else {
             return array();
         }
+    }
+    
+    public function getInstalmentDeductions() {
+        return $this->hasMany(InstalmentDeductions::className(), ['tech_deductions_id' => 'id']);
     }
 
 }
