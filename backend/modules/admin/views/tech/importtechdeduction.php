@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ?>
                     <div class="box-body">
                         <div class="form-group">
-                            <?= $form->field($model, 'category')->dropDownList(\common\models\TechDeductions::$categories, ['class' => 'form-control','prompt' => 'Select Import Type']) ?>
+                            <?= $form->field($model, 'category')->dropDownList(\common\models\TechDeductions::$import_categories, ['class' => 'form-control','prompt' => 'Select Import Type']) ?>
                         </div>
                         <div class="form-group">
                             <?= $form->field($model, 'file')->fileInput() ?>
@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <p>
                             <div style="padding:10px;"><h3 style="color:red">Hints:</h3></div>
                             <ul>
-                                <li> Please use the given excel-sheet format ( Example:<a href="download?url=web/uploads/sample/Onetime.xls"> One Time Deduction</a> , <a href="download?url=web/uploads/sample/Ongoing.xls"> On Going Deduction</a>, <a href="download?url=web/uploads/sample/Instalment.xls"> Installment Deduction</a> )</li>
+                                <li> Please use the given excel-sheet format ( Example:<a href="download?url=web/uploads/sample/Onetime.xls"> One Time Deduction</a> , <a href="download?url=web/uploads/sample/Ongoing.xls"> On Going Deduction</a> <?php /*, <a href="download?url=web/uploads/sample/Instalment.xls"> Installment Deduction</a> */?> )</li>
                                 <li> Please fill the list of mandatory fields for each schedule. (Tech ID, Category, Deduction Type, Amount, Deduction Date)</li>
                                 <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excel-sheet ( Deduction Date, Start Date, End Date )  </li>
                                 <li> Please fill the <strong>Category</strong> column using following values,
@@ -51,8 +51,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     - For OnGoing deductions use value <strong>ongoing</strong>.
                                     <br/>
                                     - For OneTime deductions use value <strong>onetime</strong>.
-                                    <br/>
-                                    - For Installment deductions use value <strong>installment</strong>.
+<!--                                    <br/>
+                                    - For Installment deductions use value <strong>installment</strong>.-->
                                 </li>
                                 <li> Please fill the <strong>Deduction Type</strong> column using following values,
                                    <br/>

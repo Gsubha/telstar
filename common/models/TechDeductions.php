@@ -28,6 +28,7 @@ class TechDeductions extends \yii\db\ActiveRecord {
     public $installment_type, $installment_amount, $installment_comment;
     public $inst_start_date,$inst_end_date,$total_amt_paid,$remain_amt,$inst_no,$inst_paid_amt,$total_paid_amt;
     public static $categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction", "installment" => "Installment deduction"];
+    public static $import_categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction"];
     public static $ongoing_categories = ["Meter" => "Meter Lease", "Truck" => "Van Lease", "WC/GL" => "WC/GL"];
     public static $wcgl_percentages = ["5" => "5 %", "8" => "8 %", "10" => "10 %", "12" => "12 %", "15" => "15 %"];
     public static $installment_categories = ['Retainer' => 'Retainer – 5% or 10%', 'Damages' => 'Damage Claim', 'Lodging' => 'Lodging', 'Loan' => 'Loan', 'Tools' => 'Tools', 'Lost CPE' => 'Lost CPE'];

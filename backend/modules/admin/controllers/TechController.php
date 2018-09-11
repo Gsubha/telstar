@@ -270,70 +270,72 @@ class TechController extends Controller {
                 }
             }
             /* Ongoing Deduction Import - End */
-        } else if ($ImportType == "installment" && $highestColumn == 'H') {
-            /* Installment Deduction Import - Start */
-            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Amount, [4] => Number of installments, [5] => Comments, [6] => StartWeek Date, [7] => EndWeek Date
-            for ($row = 1; $row <= $highestRow; $row++) {
-                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                if ($row == 1) {
-                    continue;
-                }
-                // trim the values
-                foreach ($rowData[0] as $key => $val) {
-                    $rowData[0][$key] = trim($rowData[0][$key]);
-                }
-                /* Check Tech ID Empty or not */
-                $techid = $rowData[0][0];
-                if ($techid == '' || $rowData[0][6] == '' || $rowData[0][7] == '' || $rowData[0][4] == '') {
-                    continue;
-                }
-                /* Check Tech ID Exist or not */
-                $umodel = User::find()->where(['techid' => $techid])->one();
-                if (!empty($umodel)) {
-                    $uid = $umodel->id;
-                } else {
-                    continue;
-                }
-                $model = new TechDeductions();
-                $model->user_id = $uid;
-
-                /* Check Category type Installment or not */
-                if (strtolower($rowData[0][1]) == "installment") {
-                    $model->category = strtolower($rowData[0][1]);
-                } else {
-                    continue;
-                }
-
-                $model->deduction_info = $rowData[0][2];
-                $model->total = $rowData[0][3];
-                $model->num_installment = $rowData[0][4];
-                $model->description = $rowData[0][5];
-
-                if (Myclass::validateDate($rowData[0][6])) {
-                    $model->startdate = date("Y-m-d", strtotime($rowData[0][6]));
-                } else {
-                    $model->startdate = NULL;
-                }
-
-                if (Myclass::validateDate($rowData[0][7])) {
-                    $model->enddate = date("Y-m-d", strtotime($rowData[0][7]));
-                } else {
-                    $model->enddate = NULL;
-                }
-
-                $model->upload_id = $upld_id;
-                $model->created_at = date('Y-m-d H:i:s');
-                $model->created_by = Yii::$app->user->id;
-
-                if ($model->save(false)) {
-                    \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
-                } else {
-                    // $erros = json_encode($model->errors);
-                    \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
-                }
-            }
-            /* Installment Deduction Import - End */
-        } else {
+        } 
+//        else if ($ImportType == "installment" && $highestColumn == 'H') {
+//            /* Installment Deduction Import - Start */
+//            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Amount, [4] => Number of installments, [5] => Comments, [6] => StartWeek Date, [7] => EndWeek Date
+//            for ($row = 1; $row <= $highestRow; $row++) {
+//                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+//                if ($row == 1) {
+//                    continue;
+//                }
+//                // trim the values
+//                foreach ($rowData[0] as $key => $val) {
+//                    $rowData[0][$key] = trim($rowData[0][$key]);
+//                }
+//                /* Check Tech ID Empty or not */
+//                $techid = $rowData[0][0];
+//                if ($techid == '' || $rowData[0][6] == '' || $rowData[0][7] == '' || $rowData[0][4] == '') {
+//                    continue;
+//                }
+//                /* Check Tech ID Exist or not */
+//                $umodel = User::find()->where(['techid' => $techid])->one();
+//                if (!empty($umodel)) {
+//                    $uid = $umodel->id;
+//                } else {
+//                    continue;
+//                }
+//                $model = new TechDeductions();
+//                $model->user_id = $uid;
+//
+//                /* Check Category type Installment or not */
+//                if (strtolower($rowData[0][1]) == "installment") {
+//                    $model->category = strtolower($rowData[0][1]);
+//                } else {
+//                    continue;
+//                }
+//
+//                $model->deduction_info = $rowData[0][2];
+//                $model->total = $rowData[0][3];
+//                $model->num_installment = $rowData[0][4];
+//                $model->description = $rowData[0][5];
+//
+//                if (Myclass::validateDate($rowData[0][6])) {
+//                    $model->startdate = date("Y-m-d", strtotime($rowData[0][6]));
+//                } else {
+//                    $model->startdate = NULL;
+//                }
+//
+//                if (Myclass::validateDate($rowData[0][7])) {
+//                    $model->enddate = date("Y-m-d", strtotime($rowData[0][7]));
+//                } else {
+//                    $model->enddate = NULL;
+//                }
+//
+//                $model->upload_id = $upld_id;
+//                $model->created_at = date('Y-m-d H:i:s');
+//                $model->created_by = Yii::$app->user->id;
+//
+//                if ($model->save(false)) {
+//                    \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
+//                } else {
+//                    // $erros = json_encode($model->errors);
+//                    \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
+//                }
+//            }
+//            /* Installment Deduction Import - End */
+//        } 
+        else {
             \Yii::$app->session->setFlash('error', 'Type and excelsheet format should be same');
         }
     }

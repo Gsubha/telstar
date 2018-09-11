@@ -254,14 +254,16 @@ class TechdeductionsController extends Controller {
                         }
                     }
                     $transaction->commit();
+                    return true;
                 } catch (Exception $e) {
                     $transaction->rollBack();
-                }
-                if ($model->save()) {
-                    return true;
-                } else {
                     return false;
                 }
+//                if ($model->save()) {
+//                    return true;
+//                } else {
+//                    return false;
+//                }
                 break;
         }
     }
