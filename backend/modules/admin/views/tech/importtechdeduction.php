@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <p>
                             <div style="padding:10px;"><h3 style="color:red">Hints:</h3></div>
                             <ul>
-                                <li> Please use the given excel-sheet format ( Example:<a href="download?url=web/uploads/sample/Onetime.xls"> One Time Deduction</a> , <a href="download?url=web/uploads/sample/Ongoing.xls"> On Going Deduction</a> <?php /*, <a href="download?url=web/uploads/sample/Instalment.xls"> Installment Deduction</a> */?> )</li>
+                                <li> Please use the given excel-sheet format ( Example:<a href="download?url=web/uploads/sample/Onetime.xls"> One Time Deduction</a> , <a href="download?url=web/uploads/sample/Ongoing.xls"> On Going Deduction</a> , <a href="download?url=web/uploads/sample/Instalment.xls"> Installment Deduction</a> )</li>
                                 <li> Please fill the list of mandatory fields for each schedule. (Tech ID, Category, Deduction Type, Amount, Deduction Date)</li>
                                 <li> Please fill the date format using this syntax MM/DD/YYYY. Example: 05/15/2018 . Date format fields in the excel-sheet ( Deduction Date, Start Date, End Date )  </li>
                                 <li> Please fill the <strong>Category</strong> column using following values,
@@ -51,8 +51,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     - For OnGoing deductions use value <strong>ongoing</strong>.
                                     <br/>
                                     - For OneTime deductions use value <strong>onetime</strong>.
-<!--                                    <br/>
-                                    - For Installment deductions use value <strong>installment</strong>.-->
+                                    <br/>
+                                    - For Installment deductions use value <strong>installment</strong>.
                                 </li>
                                 <li> Please fill the <strong>Deduction Type</strong> column using following values,
                                    <br/>
@@ -63,7 +63,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                     - For WC/GL, use value <strong>WC/GL</strong>. (Required: Yes/No, Percentage).
                                     <br>
                                     - For <b>Percentage</b>, use any one value from <b>5,8,10,12,15</b>.
+                                    
+                                    
                                 </li>
+                                <li> Please fill the <strong>Installment Deduction Type</strong> column using following values,
+                                    <?php
+                                        $inst_ded_cat=\common\models\TechDeductions::$installment_categories;
+                                        if(is_array($inst_ded_cat)){
+                                            foreach($inst_ded_cat as $key => $val){
+                                                echo "<br> - For $val, use value <strong>$key</strong>.";
+                                            }
+                                        }
+                                    ?>
+                                    <li><i> <strong>Note: </strong>End Week Date calculated automatically based on No.of instalments</i></li>
+                                </li>    
                                 <!--<li><i> <strong>Note: </strong>Start Date and End Date Required for periodic category </i></li>-->
 
                             </ul>

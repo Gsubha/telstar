@@ -5,6 +5,7 @@ namespace backend\modules\admin\controllers;
 use common\components\Myclass;
 use common\models\Billing;
 use common\models\ImportFiles;
+use common\models\InstalmentDeductions;
 use common\models\Location;
 use common\models\Tech;
 use common\models\TechDeductions;
@@ -270,72 +271,113 @@ class TechController extends Controller {
                 }
             }
             /* Ongoing Deduction Import - End */
-        } 
-//        else if ($ImportType == "installment" && $highestColumn == 'H') {
-//            /* Installment Deduction Import - Start */
-//            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Amount, [4] => Number of installments, [5] => Comments, [6] => StartWeek Date, [7] => EndWeek Date
-//            for ($row = 1; $row <= $highestRow; $row++) {
-//                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-//                if ($row == 1) {
-//                    continue;
-//                }
-//                // trim the values
-//                foreach ($rowData[0] as $key => $val) {
-//                    $rowData[0][$key] = trim($rowData[0][$key]);
-//                }
-//                /* Check Tech ID Empty or not */
-//                $techid = $rowData[0][0];
-//                if ($techid == '' || $rowData[0][6] == '' || $rowData[0][7] == '' || $rowData[0][4] == '') {
-//                    continue;
-//                }
-//                /* Check Tech ID Exist or not */
-//                $umodel = User::find()->where(['techid' => $techid])->one();
-//                if (!empty($umodel)) {
-//                    $uid = $umodel->id;
-//                } else {
-//                    continue;
-//                }
-//                $model = new TechDeductions();
-//                $model->user_id = $uid;
-//
-//                /* Check Category type Installment or not */
-//                if (strtolower($rowData[0][1]) == "installment") {
-//                    $model->category = strtolower($rowData[0][1]);
-//                } else {
-//                    continue;
-//                }
-//
-//                $model->deduction_info = $rowData[0][2];
-//                $model->total = $rowData[0][3];
-//                $model->num_installment = $rowData[0][4];
-//                $model->description = $rowData[0][5];
-//
-//                if (Myclass::validateDate($rowData[0][6])) {
-//                    $model->startdate = date("Y-m-d", strtotime($rowData[0][6]));
-//                } else {
-//                    $model->startdate = NULL;
-//                }
-//
-//                if (Myclass::validateDate($rowData[0][7])) {
-//                    $model->enddate = date("Y-m-d", strtotime($rowData[0][7]));
-//                } else {
-//                    $model->enddate = NULL;
-//                }
-//
-//                $model->upload_id = $upld_id;
-//                $model->created_at = date('Y-m-d H:i:s');
-//                $model->created_by = Yii::$app->user->id;
-//
-//                if ($model->save(false)) {
-//                    \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
-//                } else {
-//                    // $erros = json_encode($model->errors);
-//                    \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
-//                }
-//            }
-//            /* Installment Deduction Import - End */
-//        } 
-        else {
+        } else if ($ImportType == "installment" && $highestColumn == 'H') {
+            /* Installment Deduction Import - Start */
+            // [0] => Tech ID , [1] => Category, [2] => Deduction Type, [3] => Amount, [4] => Number of installments, [5] => Comments, [6] => StartWeek Date, [7] => EndWeek Date
+            $inserted_record=0;
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+                if ($row == 1) {
+                    continue;
+                }
+                // trim the values
+                foreach ($rowData[0] as $key => $val) {
+                    $rowData[0][$key] = trim($rowData[0][$key]);
+                }
+                /* Check Tech ID Empty or not and other required fields */
+                $techid = $rowData[0][0];
+                if ($techid == '' || $rowData[0][1] == '' || $rowData[0][2] == '' || $rowData[0][3] == '' || $rowData[0][4] == '' || $rowData[0][5] == '' || $rowData[0][6] == '') {
+                    continue;
+                }
+
+                /* Allow only existing key in array */
+                $inst_ded_cat = TechDeductions::$installment_categories;
+                if (!array_key_exists($rowData[0][2], $inst_ded_cat)) {
+                    continue;
+                }
+
+                /* Check Tech ID Exist or not */
+                $umodel = User::find()->where(['techid' => $techid])->one();
+                if (!empty($umodel)) {
+                    $uid = $umodel->id;
+                } else {
+                    continue;
+                }
+
+                // Check valid start week date
+                $start_date = NULL;
+                if (Myclass::validateDate($rowData[0][6])) {
+                    $start_date = date("Y-m-d", strtotime($rowData[0][6]));
+                } else {
+                    continue;
+                }
+
+                $model = new TechDeductions();
+                $model->user_id = $uid;
+
+                /* Check Category type Installment or not */
+                if (strtolower($rowData[0][1]) == "installment") {
+                    $model->category = strtolower($rowData[0][1]);
+                } else {
+                    continue;
+                }
+                /* Transaction Start */
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $model->deduction_info = $rowData[0][2];
+                    $model->total = $rowData[0][3];
+                    $model->num_installment = $rowData[0][4];
+                    $model->description = $rowData[0][5];
+                    $model->startdate = $start_date;
+                    $days = (($model->num_installment * 7) - 1);
+                    $model->enddate = date('Y-m-d', strtotime($rowData[0][6] . " +$days days"));
+                    /* empty other fields - start */
+                    $empty_other_installment_fields = ['deduction_date', 'serial_num', 'yes_or_no', 'vin', 'percentage', 'work_order'];
+                    foreach ($empty_other_installment_fields as $mk => $mv) {
+                        $model->$mv = NULL;
+                    }
+                    $model->upload_id = $upld_id;
+                    $model->created_at = date('Y-m-d H:i:s');
+                    $model->created_by = Yii::$app->user->id;
+                    /* empty other fields - end */
+                    if ($model->save(false)) {
+                        if ($model->isNewRecord) {
+                            $pid = Yii::$app->db->getLastInsertID();
+                        } else {
+                            $pid = $model->id;
+                            InstalmentDeductions::deleteAll(['tech_deductions_id' => $pid]);
+                        }
+                        $StDate = $model->startdate;
+                        $num_inst = $model->num_installment;
+                        $inst_price = number_format((float) ($model->total / $num_inst), 2, '.', '');
+                        for ($i = 1; $i <= $num_inst; $i++) {
+                            $inst_model = new InstalmentDeductions();
+                            $inst_model->tech_deductions_id = $pid;
+                            $inst_model->inst_start_date = $StDate;
+                            $inst_model->inst_end_date = date('Y-m-d', strtotime($StDate . ' + 6 days'));
+                            $inst_model->inst_paid_amt = $inst_price;
+                            $inst_model->total_paid_amt = $inst_price * $i;
+                            $inst_model->remain_amt = $model->total - $inst_model->total_paid_amt;
+                            $inst_model->save(false);
+                            $StDate = date('Y-m-d', strtotime($StDate . ' + 7 days'));
+                        }
+                    }
+                    if ($transaction->commit()) {
+                        \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
+                    } else {
+                        // $erros = json_encode($model->errors);
+                        \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                    // $erros = json_encode($model->errors);
+                    \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
+                }
+    
+                /* Transaction End */
+            }
+            /* Installment Deduction Import - End */
+        } else {
             \Yii::$app->session->setFlash('error', 'Type and excelsheet format should be same');
         }
     }
