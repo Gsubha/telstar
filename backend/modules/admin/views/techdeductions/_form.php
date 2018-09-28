@@ -262,6 +262,7 @@ use yii\widgets\ActiveForm;
                                 <!--<label class="col-sm-3 col-md-9 control-label">&nbsp;</label>-->
                                 <div class="col-sm-12 col-md-9 col-md-offset-2 autotable">
                                     <?php
+                                    $warning_text = '<strong>Warning:</strong> If you change any values in the fields( "Amount" or "Number of Installments" or "Start Week Date"), the Installment Deduction table will be reset.';
                                     if (!$model->isNewRecord) {
                                         if ($model->category == 'installment') {
                                             echo "<center><code><big>Installment Deduction</big></code></center>";
@@ -328,14 +329,14 @@ use yii\widgets\ActiveForm;
                                               $StDate = date('m/d/Y', strtotime($StDate . ' + 7 days'));
                                               } */
                                             echo "</table>";
+                                            echo '<div class="col-md-12 text-red">'.$warning_text.'</div>';
                                         }
                                     }
                                     ?>
                                 </div>
                             </div>
                         </div>
-
-                    </div>
+                       </div>
                     <?php /* Installment Deduction form - End */ ?>
 
                     <div class="box-footer">
@@ -354,7 +355,7 @@ $(document).ready(function(){
     $(".hideshow").hide();
     var category = '{$model->category}';
     showFields(category);
-    $(".autogen").on("blur", function(){
+    $(".autogen").on("change", function(){
     get_end_date();
     });
     
@@ -469,7 +470,7 @@ $(document).ready(function(){
           $(".autotable_div").hide();
           $(".autotable").html('');
           $(".inst_enddate").html('');
-          document.getElementById('inst_enddate').value = '';     
+          document.getElementById('inst_enddate').value = '';   
         }
     }
                 
@@ -504,7 +505,8 @@ $(document).ready(function(){
         }
         var table_end = "</table>";
         var table_datas = "<center><code><big>Installment Deduction</big></code></center>"+table_start + table_heading + table_rows + table_end;
-        $(".autotable").html(table_datas);
+        var warning_div = '<div class="col-md-12 text-red">{$warning_text}</div>';
+        $(".autotable").html(table_datas+warning_div);
     }
                 
     
