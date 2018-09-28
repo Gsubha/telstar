@@ -74,7 +74,7 @@ if (!empty($records)) {
                     $Overall_Total_amount += $rv->total;
                 }
                 break;
-                
+
             case "installment":
                 if ($rv->inst_paid_amt) {
                     $Overall_Total_amount += $rv->inst_paid_amt;
@@ -167,10 +167,17 @@ if (!empty($dataProvider->getModels())) {
                                     'attribute' => 'deduction_date',
                                     'format' => 'raw',
                                     'value' => function ($model) {
-                                        if ($model->deduction_date)
-                                            return date('m/d/Y', strtotime($model->deduction_date));
-                                        else
-                                            return "-";
+                                        if ($model->category == 'installment') {
+                                            if ($model->paid_date)
+                                                return date('m/d/Y', strtotime($model->paid_date));
+                                            else
+                                                return "-";
+                                        }else {
+                                            if ($model->deduction_date)
+                                                return date('m/d/Y', strtotime($model->deduction_date));
+                                            else
+                                                return "-";
+                                        }
                                     },
                                 ],
                                 [
@@ -190,10 +197,11 @@ if (!empty($dataProvider->getModels())) {
                                     'attribute' => 'total',
                                     'value' => function($model) {
                                         $tprice = number_format((float) $model->total, 2, '.', '');
-                                        if($model->category!='installment'){
-                                        return "<strong class='text-maroon'>".Yii::$app->formatter->asCurrency($tprice, 'USD')."</strong>";}
-                                        else{
-                                        return Yii::$app->formatter->asCurrency($tprice, 'USD');}
+                                        if ($model->category != 'installment') {
+                                            return "<strong class='text-maroon'>" . Yii::$app->formatter->asCurrency($tprice, 'USD') . "</strong>";
+                                        } else {
+                                            return Yii::$app->formatter->asCurrency($tprice, 'USD');
+                                        }
                                     },
                                 //'footer' => "<strong>" . $Total_amount . "</strong>",
                                 ],
@@ -235,11 +243,10 @@ if (!empty($dataProvider->getModels())) {
                                     'attribute' => 'inst_paid_amt',
                                     'format' => 'raw',
                                     'value' => function ($model) {
-                                        if ($model->inst_paid_amt){
+                                        if ($model->inst_paid_amt) {
                                             $inst_paid_amt = number_format((float) $model->inst_paid_amt, 2, '.', '');
-                                            return "<strong class='text-maroon'>".Yii::$app->formatter->asCurrency($inst_paid_amt, 'USD')."</strong>";
-                                        }
-                                        else
+                                            return "<strong class='text-maroon'>" . Yii::$app->formatter->asCurrency($inst_paid_amt, 'USD') . "</strong>";
+                                        } else
                                             return "-";
                                     },
                                 //'footer' => "<strong>Total</strong>",
@@ -263,6 +270,23 @@ if (!empty($dataProvider->getModels())) {
                                     'value' => function ($model) {
                                         if ($model->total_paid_amt)
                                             return $model->total_paid_amt;
+                                        else
+                                            return "-";
+                                    },
+                                //'footer' => "<strong>Total</strong>",
+                                ],
+                                [
+                                    'label' => 'Paid Status',
+                                    'attribute' => 'paid_status',
+                                    'format' => 'raw',
+                                    'value' => function ($model) {
+                                        if ($model->paid_status)
+                                        {
+                                            if($model->paid_status == "P")
+                                                return "<strong class='text-green' title='Paid'>Paid</strong>";
+                                            else
+                                                return "<strong class='text-red' title='Not Paid'>Not Paid</strong>";
+                                        }
                                         else
                                             return "-";
                                     },

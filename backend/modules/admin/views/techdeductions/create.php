@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\Techdeductions */
 
 $this->title = 'Create Tech Deduction';
-$this->params['breadcrumbs'][] = ['label' => 'Tech Deductions', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Tech Deductions', 'url' => ['tech/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-create">

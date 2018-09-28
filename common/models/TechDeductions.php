@@ -26,7 +26,7 @@ class TechDeductions extends \yii\db\ActiveRecord {
 
     public $file, $techid, $van_deduction_date, $van_amount, $van_yes, $wcgl_yes, $onetime_amt, $onetime_deduction_type, $issue_date,$ongoing_type;
     public $installment_type, $installment_amount, $installment_comment;
-    public $inst_start_date,$inst_end_date,$total_amt_paid,$remain_amt,$inst_no,$inst_paid_amt,$total_paid_amt;
+    public $inst_start_date,$inst_end_date,$total_amt_paid,$remain_amt,$inst_no,$inst_paid_amt,$total_paid_amt,$paid_status,$paid_date;
     public static $categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction", "installment" => "Installment deduction"];
     public static $import_categories = ["ongoing" => "On-going deduction", "onetime" => "One time deduction", "installment" => "Installment deduction"];
     public static $ongoing_categories = ["Meter" => "Meter Lease", "Truck" => "Van Lease", "WC/GL" => "WC/GL"];

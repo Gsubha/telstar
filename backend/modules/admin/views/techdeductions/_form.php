@@ -258,23 +258,77 @@ use yii\widgets\ActiveForm;
                             </div>
                         </div>
                         <div class="form-group autotable_div">
-                            <div class="col-md-8">
-                                <label class="col-sm-3 control-label">&nbsp;</label>
-                                <div class="col-sm-8 autotable">
+                            <div class="col-md-9">
+                                <!--<label class="col-sm-3 col-md-9 control-label">&nbsp;</label>-->
+                                <div class="col-sm-12 col-md-9 col-md-offset-2 autotable">
                                     <?php
                                     if (!$model->isNewRecord) {
-                                        echo "<center><code><big>Installment Deduction</big></code></center>";
-                                        echo "<table class='table'>";
-                                        echo "<th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th>";
-                                        $StDate = date('m/d/Y', strtotime($model->startdate));
-                                        $num_inst = $model->num_installment;
-                                        $inst_price = number_format((float) ($model->total / $num_inst), 2, '.', '');
-                                        for ($i = 1; $i <= $num_inst; $i++) {
-                                            echo "<tr><td>$i</td><td>$StDate<td>" . date('m/d/Y', strtotime($StDate . ' + 6 days')) . "</td><td>$inst_price</td>";
-                                            $model->inst_start_date = $StDate;
-                                            $StDate = date('m/d/Y', strtotime($StDate . ' + 7 days'));
+                                        if ($model->category == 'installment') {
+                                            echo "<center><code><big>Installment Deduction</big></code></center>";
+                                            echo "<table class='table'>";
+                                            echo "<tr><th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th><th>Payment Status</th><th>Paid Date</th></tr>";
+                                            //$StDate = date('m/d/Y', strtotime($model->startdate));
+                                            $num_inst = $model->num_installment;
+                                            $inst_price = "$ " . number_format((float) ($model->total / $num_inst), 2, '.', '');
+                                            $payment_status_arr = ['Not Paid' => 'NP', 'Paid' => 'P'];
+                                            $inst_ded_model = new common\models\InstalmentDeductions;
+                                            $all_datas = $inst_ded_model->findall(['tech_deductions_id' => $model->id]);
+                                            $i = 1;
+                                            foreach ($all_datas as $res) {
+                                                echo "<tr><td>$i</td><td>" . date('m/d/Y', strtotime($res->inst_start_date)) . "<td>" . date('m/d/Y', strtotime($res->inst_end_date)) . "</td><td>$inst_price</td>";
+                                                echo "<td>";
+                                                $sel = '';
+                                                if ($res->paid_date) {
+                                                    $paid_date = date('m/d/Y', strtotime($res->paid_date));
+                                                } else {
+                                                    $paid_date = NULL;
+                                                }
+
+                                                echo "<select class='form-control' name=paid[status][$i]>";
+                                                foreach ($payment_status_arr as $ps_key => $ps_val) {
+                                                    if ($res->paid_status == $ps_val) {
+                                                        echo "<option value='$ps_val' selected >$ps_key</option>";
+                                                    } else {
+                                                        echo "<option value='$ps_val' >$ps_key</option>";
+                                                    }
+                                                }
+
+                                                echo "</select>"
+                                                . "</td>"
+                                                . "<td>"
+                                                . "<input type='text' value='" . $paid_date . "' class='form-control insdatepicker'  id='paid_date_$i' name=paid[date][$i]  />"
+                                                . "</td>"
+                                                . "</tr>";
+//                                            $model->inst_start_date = $StDate;
+//                                            $StDate = date('m/d/Y', strtotime($StDate . ' + 7 days'));
+                                                $i++;
+                                            }
+
+                                            /* for ($i = 1; $i <= $num_inst; $i++) {
+                                              echo "<tr><td>$i</td><td>$StDate<td>" . date('m/d/Y', strtotime($StDate . ' + 6 days')) . "</td><td>$inst_price</td>";
+                                              echo "<td>";
+                                              $sel='';
+
+
+                                              echo "<select class='form-control' name=paid[status][$i]>";
+                                              foreach($payment_status_arr as $ps_key => $ps_val){
+                                              if($model->paid_status == $ps_val){
+                                              echo  "<option value='$ps_val' selected >$ps_key</option>";
+                                              }else{
+                                              echo  "<option value='$ps_val' >$ps_key</option>";
+                                              }
+                                              }
+                                              echo "</select>"
+                                              . "</td>"
+                                              . "<td>"
+                                              . "<input type='text' class='form-control insdatepicker'  id='paid_date_$i' name=paid[date][$i]  />"
+                                              . "</td>"
+                                              . "</tr>";
+                                              $model->inst_start_date = $StDate;
+                                              $StDate = date('m/d/Y', strtotime($StDate . ' + 7 days'));
+                                              } */
+                                            echo "</table>";
                                         }
-                                        echo "</table>";
                                     }
                                     ?>
                                 </div>
@@ -304,6 +358,9 @@ $(document).ready(function(){
     get_end_date();
     });
     
+    $('.insdatepicker').datepicker({
+    autoclose: true
+    });
     
     $('.datepicker').datepicker({
       //dateFormat: 'yy-mm-dd' ,
@@ -404,6 +461,9 @@ $(document).ready(function(){
         document.getElementById('inst_enddate').value = endDate;
         generate_table(start_date,ins_count,amt);
         $(".autotable_div").show();
+        $('.insdatepicker').datepicker({
+        autoclose: true
+        });
         }
         else{
           $(".autotable_div").hide();
@@ -416,9 +476,10 @@ $(document).ready(function(){
     function generate_table(start_date, ins_count, amt)
     {
         var table_start = "<table class='table'>";
-        var table_heading = "<th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th>";
+        var table_heading = "<th>S.no</th><th>Start Date</th><th>End Date</th><th>Amount</th><th>Payment Status</th><th>Paid Date</th>";
         var inst_amt = ((parseFloat)(amt) / (parseInt)(ins_count)).toFixed(2);
         var table_rows = '';
+        var dd='';
         for (i = 1; i <= ins_count; i++)
         {
             var startDate = new Date(start_date);
@@ -430,7 +491,7 @@ $(document).ready(function(){
             var y =  newdate.getFullYear();
 
             var endDate = mm + '/' + dd + '/' + y;
-            table_rows += "<tr><td>"+i+"</td><td>" + start_date + "</td><td>" + endDate + "</td><td>$ " + inst_amt + "</td>";
+            table_rows += "<tr><td>"+i+"</td><td>" + start_date + "</td><td>" + endDate + "</td><td>$ " + inst_amt + "</td><td><select class='form-control' name=paid[status]["+i+"]><option value='NP'>Not Paid</option><option value='P'>Paid</option></select></td><td><input type='text' class='form-control insdatepicker'  id='paid_date_"+i+"' name=paid[date]["+i+"]/></td>";
             new_start_date = new Date(endDate);
             new_start_date.setDate(new_start_date.getDate() + 1);
 

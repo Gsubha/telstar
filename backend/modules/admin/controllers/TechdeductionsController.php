@@ -241,6 +241,7 @@ class TechdeductionsController extends Controller {
                         $StDate = $model->startdate;
                         $num_inst = $model->num_installment;
                         $inst_price = number_format((float) ($model->total / $num_inst), 2, '.', '');
+                        
                         for ($i = 1; $i <= $num_inst; $i++) {
                             $inst_model = new InstalmentDeductions();
                             $inst_model->tech_deductions_id = $pid;
@@ -249,6 +250,13 @@ class TechdeductionsController extends Controller {
                             $inst_model->inst_paid_amt = $inst_price;
                             $inst_model->total_paid_amt = $inst_price*$i;
                             $inst_model->remain_amt = $model->total - $inst_model->total_paid_amt;
+                            $paidArr=$post['paid'];
+                            $inst_model->paid_status = $paidArr['status'][$i];
+                            if(empty($paidArr['date'][$i])){
+                                $inst_model->paid_date = NULL;
+                            }else{
+                                $inst_model->paid_date = date("Y-m-d",strtotime($paidArr['date'][$i]));
+                            }
                             $inst_model->save();
                             $StDate = date('Y-m-d', strtotime($StDate . ' + 7 days'));
                         }

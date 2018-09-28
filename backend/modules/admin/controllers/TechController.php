@@ -362,12 +362,8 @@ class TechController extends Controller {
                             $StDate = date('Y-m-d', strtotime($StDate . ' + 7 days'));
                         }
                     }
-                    if ($transaction->commit()) {
-                        \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
-                    } else {
-                        // $erros = json_encode($model->errors);
-                        \Yii::$app->session->setFlash('error', 'Failed to Import Installment Tech Deduction. Please try again');
-                    }
+                    \Yii::$app->session->setFlash('success', 'Installment Tech Deduction Imported Successfully');
+                    $transaction->commit();
                 } catch (Exception $e) {
                     $transaction->rollBack();
                     // $erros = json_encode($model->errors);
