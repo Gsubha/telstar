@@ -337,21 +337,15 @@ $(document).ready(function(){
       var pageURL = window.location.hostname + window.location.pathname;
       window.location.href=document.location.protocol +"//"+pageURL+'?'+k;
     });
-    
-    /*$("#printdiv").click(function() {   
-        var innerContents = document.getElementById("Getprintval").innerHTML;
-        var popupWinindow = window.open('', '_blank', 'width=700,height=700,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
-        popupWinindow.document.open();
-        popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="/webpanel/themes/admin/css/print.css" /></head><body onload="window.print()">' + innerContents + '</html>');    popupWinindow.document.close();  
-    });*/
+
         
     $("#printdiv").click(function() {   
-        $("tfoot tr > td:last-of-type").addClass("hidden-print"); // for to hide last td in tfoot
+        $("tfoot tr > td:last-of-type").addClass("hidden-print");
         var innerContents = document.getElementById("Getprintval").innerHTML;
         var popupWinindow = window.open('', '_blank', 'width=700,height=700,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
         popupWinindow.document.open();
         var innerstyle='<style>.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{padding: 4px;font-size: 12px;line-height: initial;}h3, .h3, h4, .h4 {font-size: 16px;margin-top:2px;margin-bottom:5px}.panel-body {    padding: 5px 15px;}</style>';
-        popupWinindow.document.write('<html><head><link rel="stylesheet" type="text/css" href="/webpanel/themes/admin/css/print.css" />' + innerstyle + '</head><body onload="window.print()">' + innerContents + '</html>');    popupWinindow.document.close();  
+        popupWinindow.document.write('<head><link rel="stylesheet" type="text/css" href="/webpanel/themes/admin/css/print.css" />' + innerstyle + '</head><body onload="window.print()">' + innerContents);    popupWinindow.document.close();  
     });
     
 });
